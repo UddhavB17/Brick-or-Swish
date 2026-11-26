@@ -1,0 +1,29 @@
+#!/usr/bin/env bash
+# Runs the third-umpire CLI. Uses the umpire/ package next to this skill when the
+# skill lives in its repo (or UMPIRE_HOME points at one), else installs it from GitHub with uvx.
+set -euo pipefail
+
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+pkg="${UMPIRE_HOME:-$here/../../../umpire}"
+repo="git+https://github.com/UddhavB17/Brick-or-Swish#subdirectory=umpire"
+
+if [ -f "$pkg/pyproject.toml" ]; then
+  pkg="$(cd "$pkg" && pwd)"
+  if command -v uv >/dev/null 2>&1; then
+    exec uv run --quiet --project "$pkg" third-umpire "$@"
+  fi
+  if [ -x "$pkg/.venv/bin/third-umpire" ]; then
+    exec "$pkg/.venv/bin/third-umpire" "$@"
+  fi
+  if python3 -c "import rich" >/dev/null 2>&1; then
+    PYTHONPATH="$pkg${PYTHONPATH:+:$PYTHONPATH}" exec python3 -m third_umpire "$@"
+  fi
+fi
+
+if command -v uvx >/dev/null 2>&1; then
+  exec uvx --quiet --from "$repo" third-umpire "$@"
+fi
+
+echo "third-umpire: can't run. Install uv (curl -LsSf https://astral.sh/uv/install.sh | sh)," >&2
+echo "or 'pip install rich' and set UMPIRE_HOME to the umpire/ directory." >&2
+exit 1

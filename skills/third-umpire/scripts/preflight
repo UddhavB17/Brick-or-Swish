@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# Checks what a live review needs, one line each. Exits 1 if anything blocks a live
+# review; fixture reviews (--fixture) need none of it.
+set -uo pipefail
+
+here="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+blocked=0
+say() { printf '%-8s %s\n' "$1" "$2"; }
+
+if version="$(flagsmith --version 2>/dev/null)"; then
+  major="$(sed -E 's/.*v([0-9]+).*/\1/' <<<"$version")"
+  if [ "${major:-0}" -ge 2 ] 2>/dev/null; then
+    say ok "$version"
+  else
+    say BLOCKER "$version is too old, need v2+: curl -fsSL https://get.flagsmith.com | sh"
+    blocked=1
+  fi
+else
+  say BLOCKER "flagsmith CLI not found: curl -fsSL https://get.flagsmith.com | sh"
+  blocked=1
+fi
+
+if [ "$blocked" = 0 ]; then
+  if flagsmith auth status --no-input >/dev/null 2>&1; then
+    say ok "flagsmith authenticated${FLAGSMITH_API_URL:+ against $FLAGSMITH_API_URL}"
+  else
+    say BLOCKER "flagsmith not authenticated: run 'flagsmith login', or set FLAGSMITH_API_KEY to a Master API key"
+    blocked=1
+  fi
+fi
+
+if [ -n "${FLAGSMITH_ENVIRONMENT:-}" ]; then
+  say ok "FLAGSMITH_ENVIRONMENT is set"
+else
+  say note "FLAGSMITH_ENVIRONMENT not set: pass -e <client-side environment key>"
+fi
+
+dir="$PWD"
+while [ "$dir" != "/" ] && [ ! -f "$dir/HYPOTHESIS.md" ]; do dir="$(dirname "$dir")"; done
+if [ -f "$dir/HYPOTHESIS.md" ]; then
+  say ok "pre-registration: $dir/HYPOTHESIS.md"
+else
+  say note "no HYPOTHESIS.md here or above: pass --hypothesis PATH (without one every review is refused)"
+fi
+
+if command -v uv >/dev/null 2>&1 || python3 -c "import rich" >/dev/null 2>&1; then
+  say ok "python runtime for scripts/umpire"
+else
+  say BLOCKER "no uv and no python 'rich': curl -LsSf https://astral.sh/uv/install.sh | sh"
+  blocked=1
+fi
+
+provider="${UMPIRE_LLM_PROVIDER:-}"
+if [ "$provider" = none ]; then
+  say note "explanations: template (UMPIRE_LLM_PROVIDER=none)"
+elif [ -n "${OPENAI_API_KEY:-}${ANTHROPIC_API_KEY:-}${XAI_API_KEY:-}" ] ||
+     { [ -n "$provider" ] && [ -n "${UMPIRE_LLM_API_KEY:-}" ]; }; then
+  say ok "explanations: written by an LLM (verdicts stay deterministic)"
+else
+  say note "explanations: template (no LLM key set)"
+fi
+
+[ "$blocked" = 0 ] || say note "fixtures still work: $here/umpire review --fixture bad-peeking --json"
+exit "$blocked"
