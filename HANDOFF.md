@@ -140,6 +140,8 @@ Playwright video needs `npx playwright-core install ffmpeg` once.
 ## Repo rules
 
 - Commits authored as `UddhavB17 <200227057+UddhavB17@users.noreply.github.com>`; no co-author trailers or bot signatures;
-  small conventional commits.
+  small conventional commits. Cursor cloud agents run a managed `commit-msg` hook that appends a `Co-authored-by` trailer;
+  strip it from unpushed commits with
+  `git filter-branch -f --msg-filter "sed '/^Co-authored-by: /d' | git stripspace" origin/<branch>..HEAD`.
 - Never commit `.env`, `flagsmith.json` or real keys. Client-side keys only in `VITE_` variables.
 - Simulated traffic only in the Demo environment.
