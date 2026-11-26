@@ -58,7 +58,10 @@ def worst(statuses: Iterable[str]) -> str:
 def pct(x: float | None, signed: bool = False, digits: int = 1) -> str:
     if x is None:
         return "n/a"
-    return f"{x * 100:+.{digits}f}%" if signed else f"{x * 100:.{digits}f}%"
+    value = x * 100
+    if round(value, digits) == 0:
+        value = 0.0
+    return f"{value:+.{digits}f}%" if signed else f"{value:.{digits}f}%"
 
 
 def p_value(p: float) -> str:
@@ -195,7 +198,7 @@ def _interval(inf: Inference) -> str:
 
 
 def check_preregistration(ctx: Context) -> Check:
-    c = Check("preregistration", "Pre-registration on file", VALIDITY, PASS, "")
+    c = Check("preregistration", "Pre-registration", VALIDITY, PASS, "")
     pre, exp = ctx.pre, ctx.snap.experiment
     if pre is None:
         c.status = FAIL
@@ -238,7 +241,7 @@ def check_preregistration(ctx: Context) -> Check:
 
 
 def check_srm(ctx: Context) -> Check:
-    c = Check("srm", "Traffic split matches the configuration", VALIDITY, PASS, "")
+    c = Check("srm", "Traffic split (SRM)", VALIDITY, PASS, "")
     exp, results = ctx.snap.experiment, ctx.snap.results
     alpha = ctx.pre.srm_alpha if ctx.pre else 0.001
     if not ctx.shares:
@@ -254,7 +257,9 @@ def check_srm(ctx: Context) -> Check:
         c.summary = f"Only {total} exposed identities; the split can't be tested below {SRM_MIN_TOTAL}."
         return c
     test = stats.srm(ctx.counts, ctx.shares)
-    assert test is not None
+    if test is None:
+        c.status, c.summary = WARN, "The split can't be tested against these exposures."
+        return c
     c.data = {"p_value": test.p_value, "statistic": test.statistic, "reported_p_value": reported}
     c.evidence.append(f"Chi-squared {test.statistic:.1f}, p = {p_value(test.p_value)} (invalid below p < {alpha:g})")
     if reported is None:
@@ -280,7 +285,7 @@ def check_srm(ctx: Context) -> Check:
 
 
 def check_one_sided(ctx: Context) -> Check:
-    c = Check("one_sided", "Exposures arrive in every arm", VALIDITY, PASS, "")
+    c = Check("one_sided", "Exposures in every arm", VALIDITY, PASS, "")
     arms = ctx.arms
     totals = {k: ctx.counts.get(k, 0) for k in arms}
     c.evidence.append("Exposed identities: " + ", ".join(f"{k} {v:,}" for k, v in totals.items()))
@@ -319,7 +324,7 @@ def check_one_sided(ctx: Context) -> Check:
 
 
 def check_dual_exposure(ctx: Context) -> Check:
-    c = Check("dual_exposure", "Nobody saw both variants", VALIDITY, PASS, "")
+    c = Check("dual_exposure", "Users in both variants", VALIDITY, PASS, "")
     if ctx.snap.exposures is None:
         c.status, c.summary = WARN, "Exposures haven't been computed yet, so cross-exposure can't be checked."
         return c
@@ -346,7 +351,7 @@ def check_dual_exposure(ctx: Context) -> Check:
 
 
 def check_conversion_wiring(ctx: Context) -> Check:
-    c = Check("conversion_wiring", "Conversions keep pace with exposures", VALIDITY, PASS, "")
+    c = Check("conversion_wiring", "Conversion tracking", VALIDITY, PASS, "")
     results = ctx.snap.results
     if not results or not ctx.primary_result:
         c.status, c.summary = WARN, "No results yet, so conversion tracking can't be checked."
@@ -429,7 +434,7 @@ def _audit_relevant(ctx: Context) -> list[tuple[str, Any]]:
 
 
 def check_audit(ctx: Context) -> Check:
-    c = Check("audit", "No edits after launch", VALIDITY, PASS, "")
+    c = Check("audit", "Edits after launch", VALIDITY, PASS, "")
     exp = ctx.snap.experiment
     if ctx.snap.audit is None:
         c.status = WARN
@@ -465,7 +470,7 @@ def check_audit(ctx: Context) -> Check:
 
 
 def check_sample_size(ctx: Context) -> Check:
-    c = Check("sample_size", "Pre-registered sample size and runtime", READINESS, PASS, "")
+    c = Check("sample_size", "Sample size and runtime", READINESS, PASS, "")
     pre, exp = ctx.pre, ctx.snap.experiment
     if pre is None:
         c.status, c.summary = FAIL, "No pre-registered sample size to compare against."
@@ -506,7 +511,7 @@ def check_sample_size(ctx: Context) -> Check:
 
 
 def check_interval(ctx: Context) -> Check:
-    c = Check("interval", "Credible interval clears zero", DECISION, PASS, "")
+    c = Check("interval", "Credible interval vs zero", DECISION, PASS, "")
     metric, key = ctx.primary, ctx.treatment
     reported, recomputed = ctx.reported(metric, key), ctx.recomputed(metric, key)
     inf = reported or recomputed
@@ -545,7 +550,7 @@ def check_interval(ctx: Context) -> Check:
 
 
 def check_guardrail(ctx: Context) -> Check:
-    c = Check("guardrail", "Guardrail not credibly worse", DECISION, PASS, "")
+    c = Check("guardrail", "Guardrail", DECISION, PASS, "")
     key = ctx.treatment
     expected = set(ctx.pre.guardrail_events) if ctx.pre else set()
     attached = {m.event for m in ctx.guardrails if m.event}
@@ -556,7 +561,10 @@ def check_guardrail(ctx: Context) -> Check:
             f" ({', '.join(missing)} is pre-registered)." if missing else "."
         )
         return c
-    statuses, worse = [], []
+    names = [m.event or m.name for m in ctx.guardrails]
+    if len(names) == 1 and len(names[0]) <= 16:
+        c.title = f"Guardrail ({names[0]})"
+    statuses, worse, seen = [], [], []
     for metric in ctx.guardrails:
         inf = ctx.inference(metric, key)
         name = metric.event or metric.name
@@ -564,6 +572,7 @@ def check_guardrail(ctx: Context) -> Check:
             statuses.append(WARN)
             c.evidence.append(f"{name}: not enough data yet")
             continue
+        seen.append(f"{name} {_interval(inf)}")
         # A guardrail fails when its interval sits entirely on the harmful side of zero.
         harmful_up = metric.lower_is_better or metric.expected_direction == "not_increase"
         credibly_worse = inf.ci_low > 0 if harmful_up else inf.ci_high < 0
@@ -587,12 +596,12 @@ def check_guardrail(ctx: Context) -> Check:
     elif c.status == WARN:
         c.summary = "The guardrail leans worse or lacks data, but isn't credibly worse."
     else:
-        c.summary = "The guardrail is not credibly worse."
+        c.summary = f"The guardrail is not credibly worse: {'; '.join(seen)}."
     return c
 
 
 def check_novelty(ctx: Context) -> Check:
-    c = Check("novelty", "Effect holds early vs late", DECISION, PASS, "")
+    c = Check("novelty", "Early vs late (novelty)", DECISION, PASS, "")
     key, result = ctx.treatment, ctx.primary_result
     series = ctx.exposure_series
     mid = _cut(ctx, 1 / 2)
@@ -635,7 +644,7 @@ def check_novelty(ctx: Context) -> Check:
 
 
 def check_stopping_rule(ctx: Context, sample: Check, guardrail: Check) -> Check:
-    c = Check("stopping_rule", "Pre-registered decision rule", DECISION, PASS, "")
+    c = Check("stopping_rule", "Stopping rule", DECISION, PASS, "")
     pre, key = ctx.pre, ctx.treatment
     inf = ctx.inference(ctx.primary, key)
     if pre is None or key is None:

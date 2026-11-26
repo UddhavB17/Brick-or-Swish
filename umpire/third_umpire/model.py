@@ -163,8 +163,9 @@ class Experiment:
         if not weights or allocated <= 0 or allocated > 100:
             return None, source
         shares = {CONTROL: (100 - allocated) / 100}
-        shares.update({k: w / 100 for k, w in weights.items() if w > 0})
-        return shares, source
+        shares.update({k: w / 100 for k, w in weights.items()})
+        shares = {k: v for k, v in shares.items() if v > 0}
+        return (shares if len(shares) >= 2 else None), source
 
 
 @dataclass(frozen=True)
