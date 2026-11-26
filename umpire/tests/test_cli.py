@@ -92,3 +92,10 @@ def test_markdown_report_is_written(capsys, tmp_path, name):
     files = list(tmp_path.glob("412-*.md"))
     assert len(files) == 1
     assert files[0].read_text().startswith("# Third Umpire report:")
+
+
+def test_svg_export(capsys, tmp_path):
+    svg = tmp_path / "report.svg"
+    code, _, _ = run(capsys, "review", "--fixture", "bad-peeking", "--no-report", "--svg", str(svg))
+    assert code == 2
+    assert svg.read_text().startswith("<svg") and "VERDICT" in svg.read_text()

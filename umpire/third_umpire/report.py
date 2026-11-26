@@ -20,6 +20,8 @@ from .verdict import DONT_SHIP, KEEP_RUNNING, SHIP, Verdict
 
 BADGE = {PASS: "bold black on green3", WARN: "bold black on gold1", FAIL: "bold white on red3"}
 CALL_STYLE = {SHIP: "green3", DONT_SHIP: "red3", KEEP_RUNNING: "gold1"}
+TERMINAL_EVIDENCE = 3
+MAX_WIDTH = 120
 GROUPS = [
     (VALIDITY, "VALIDITY", "can the data be trusted?"),
     (READINESS, "READINESS", "is it time to decide?"),
@@ -66,9 +68,12 @@ def render_terminal(console: Console, ctx: Context, checks: list[Check], verdict
         for c in group:
             table.add_row(Text(f" {c.status} ", style=BADGE[c.status]), Text(c.title, style="bold"),
                           Text(c.summary, style="default" if c.status != PASS else "grey70"))
-            if c.status != PASS or verbose:
-                for line in c.evidence:
-                    table.add_row("", "", Text(f"· {line}", style="grey50"))
+            shown = c.evidence if verbose else c.evidence[:TERMINAL_EVIDENCE] if c.status != PASS else []
+            for line in shown:
+                table.add_row("", "", Text(f"· {line}", style="grey50"))
+            if len(c.evidence) > len(shown) and c.status != PASS:
+                more = len(c.evidence) - len(shown)
+                table.add_row("", "", Text(f"· {more} more in the markdown report or with --verbose", style="grey42"))
         console.print(Padding(table, (0, 0, 1, 2)))
 
     style = CALL_STYLE[verdict.call]

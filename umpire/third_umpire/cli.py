@@ -45,6 +45,7 @@ def _parser() -> argparse.ArgumentParser:
     review.add_argument("--json", action="store_true", help="print a compact JSON summary (for agents)")
     review.add_argument("--verbose", "-v", action="store_true", help="show evidence for passing checks too")
     review.add_argument("--token-log", metavar="FILE", help="write a token count of everything read to FILE")
+    review.add_argument("--svg", metavar="FILE", help="also save the terminal report as an SVG image")
 
     listing = sub.add_parser("list", help="list experiments in an environment")
     listing.add_argument("--environment", "-e", help="client-side environment key (env: FLAGSMITH_ENVIRONMENT)")
@@ -102,6 +103,7 @@ def _command_line(args: argparse.Namespace, env_key: str | None, experiment_id: 
 def cmd_review(args: argparse.Namespace) -> int:
     ledger = Ledger() if args.token_log else None
     console = Console(stderr=args.json, record=True, highlight=False)
+    console.width = min(console.width, report.MAX_WIDTH)
     if args.fixture:
         backend: Any = fs.FixtureBackend.load(args.fixture, ledger)
         env_key, experiment_id = backend.environment_key, args.experiment or backend.experiment_id
@@ -135,7 +137,9 @@ def cmd_review(args: argparse.Namespace) -> int:
                           separators=(",", ":"), ensure_ascii=False)
         print(text)
     else:
-        text = console.export_text()
+        text = console.export_text(clear=False)
+        if args.svg:
+            console.save_svg(args.svg, title=f"third-umpire · {ctx.snap.experiment.name}")
     if ledger is not None:
         ledger.record("agent-output", "review --json" if args.json else "review (terminal)", text)
         ledger.write(args.token_log)

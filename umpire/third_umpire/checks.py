@@ -249,16 +249,18 @@ def check_srm(ctx: Context) -> Check:
         return c
     total = sum(ctx.counts.get(k, 0) for k in ctx.shares)
     rollout = f", {exp.rollout_percentage:g}% of identities enrolled" if exp.rollout_percentage is not None else ""
-    c.evidence.append(f"Configured: {_split_label(ctx.shares)} ({ctx.shares_source}{rollout})")
-    c.evidence.append(f"Observed: {_counts_label(ctx.counts, ctx.shares)}")
+    split = [f"Configured: {_split_label(ctx.shares)} ({ctx.shares_source}{rollout})",
+             f"Observed: {_counts_label(ctx.counts, ctx.shares)}"]
     reported = results.srm_p_value if results else None
     if total < SRM_MIN_TOTAL:
         c.status = WARN
         c.summary = f"Only {total} exposed identities; the split can't be tested below {SRM_MIN_TOTAL}."
+        c.evidence.extend(split)
         return c
     test = stats.srm(ctx.counts, ctx.shares)
     if test is None:
         c.status, c.summary = WARN, "The split can't be tested against these exposures."
+        c.evidence.extend(split)
         return c
     c.data = {"p_value": test.p_value, "statistic": test.statistic, "reported_p_value": reported}
     c.evidence.append(f"Chi-squared {test.statistic:.1f}, p = {p_value(test.p_value)} (invalid below p < {alpha:g})")
@@ -269,6 +271,7 @@ def check_srm(ctx: Context) -> Check:
         )
     else:
         c.evidence.append(f"Flagsmith's own SRM p-value: {p_value(reported)}")
+    c.evidence.extend(split)
     lowest = min(test.p_value, reported if reported is not None else 1.0)
     if lowest < alpha:
         c.status = FAIL
@@ -446,13 +449,13 @@ def check_audit(ctx: Context) -> Check:
     if exp.started_at is None:
         c.status, c.summary = WARN, "The experiment hasn't started, so there is no launch to compare against."
         return c
-    hits = _audit_relevant(ctx)
+    hits = sorted(_audit_relevant(ctx), key=lambda hit: hit[1].created_date)
     since = [e for e in ctx.snap.audit if e.created_date > exp.started_at]
-    c.evidence.append(f"{len(since)} audit entries in the project since launch at {when(exp.started_at)}")
     for severity, entry in hits:
         hours_in = hours(entry.created_date - exp.started_at)
         author = entry.author or "an API key"
         c.evidence.append(f"{severity} {when(entry.created_date)} ({hours_in:.1f} h in) by {author}: {entry.log}")
+    c.evidence.append(f"{len(since)} audit entries in the project since launch at {when(exp.started_at)}")
     c.data = {"edits": len([h for h in hits if h[0] == FAIL]), "pauses": len([h for h in hits if h[0] == WARN])}
     c.status = worst(s for s, _ in hits)
     if c.status == FAIL:
