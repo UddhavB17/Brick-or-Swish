@@ -90,6 +90,7 @@ export class Game {
 
   private zoom = 1;
   private shake = 0;
+  private readonly reducedMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
   private flash = 0;
   private boardGlow = 0;
   private rimShake = 0;
@@ -304,7 +305,8 @@ export class Game {
     this.particles.update(dt);
 
     const slowTarget = this.timeScale < 0.8 ? 1 : 0;
-    this.zoom += ((slowTarget ? 1.32 : 1) - this.zoom) * Math.min(1, dt * (slowTarget ? 3 : 2.2));
+    const zoomIn = this.reducedMotion ? 1.08 : 1.32;
+    this.zoom += ((slowTarget ? zoomIn : 1) - this.zoom) * Math.min(1, dt * (slowTarget ? 3 : 2.2));
     this.shake *= Math.exp(-dt * 9);
     this.flash *= Math.exp(-dt * 7);
     this.boardGlow *= Math.exp(-dt * 3);
@@ -478,8 +480,8 @@ export class Game {
       net: this.net,
       particles: this.particles,
       zoom: this.zoom,
-      shakeX: (Math.random() - 0.5) * this.shake,
-      shakeY: (Math.random() - 0.5) * this.shake,
+      shakeX: this.reducedMotion ? 0 : (Math.random() - 0.5) * this.shake,
+      shakeY: this.reducedMotion ? 0 : (Math.random() - 0.5) * this.shake,
       slowmo,
       flash: this.flash,
       boardGlow: this.boardGlow,
