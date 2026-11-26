@@ -17,7 +17,7 @@ from typing import Any
 
 from rich.console import Console
 
-from . import __version__, checks, explain, gate, hypothesis, report, verdict
+from . import __version__, checks, explain, gate, hypothesis, report, tokens, verdict
 from . import flagsmith as fs
 from .tokens import Ledger
 
@@ -51,6 +51,9 @@ def _parser() -> argparse.ArgumentParser:
     listing.add_argument("--api-url", default=os.environ.get("FLAGSMITH_API_URL"))
 
     sub.add_parser("fixtures", help="list the packaged fixtures")
+
+    count = sub.add_parser("count-tokens", help="count tokens in files (or stdin) the way --token-log does")
+    count.add_argument("files", nargs="*")
 
     mock = sub.add_parser("serve-fixture", help="serve a fixture as a local mock of the Flagsmith API")
     mock.add_argument("fixture")
@@ -154,6 +157,14 @@ def cmd_fixtures(_: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_count(args: argparse.Namespace) -> int:
+    for name in args.files or ["-"]:
+        text = sys.stdin.read() if name == "-" else Path(name).read_text(encoding="utf-8")
+        print(f"{tokens.count(text)}\t{name}")
+    print(f"method: {tokens.method()}", file=sys.stderr)
+    return 0
+
+
 def cmd_serve(args: argparse.Namespace) -> int:
     from .mockserver import DEMO_KEY, scoped_key_var, serve
 
@@ -175,7 +186,8 @@ def cmd_serve(args: argparse.Namespace) -> int:
 
 def main(argv: list[str] | None = None) -> int:
     args = _parser().parse_args(argv)
-    handlers = {"review": cmd_review, "list": cmd_list, "fixtures": cmd_fixtures, "serve-fixture": cmd_serve}
+    handlers = {"review": cmd_review, "list": cmd_list, "fixtures": cmd_fixtures, "count-tokens": cmd_count,
+                "serve-fixture": cmd_serve}
     try:
         return handlers[args.command](args)
     except fs.FlagsmithError as exc:

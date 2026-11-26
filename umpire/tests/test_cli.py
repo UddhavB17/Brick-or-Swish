@@ -17,8 +17,8 @@ def test_bad_fixture_exits_2_with_reasons(capsys, tmp_path):
     assert code == 2
     data = json.loads(out)
     assert data["verdict"] == "DON'T SHIP"
-    assert {c["id"] for c in data["checks"] if c["status"] == "FAIL"} >= {"srm", "dual_exposure", "audit",
-                                                                           "sample_size"}
+    failed = {k for k, v in data["checks"].items() if v == "FAIL"}
+    assert failed >= {"srm", "dual_exposure", "audit", "sample_size"}
     assert data["approval"]["outcome"] == "refused"
     report = (tmp_path / data["report"].split("/")[-1]).read_text()
     assert "**Verdict: DON'T SHIP.**" in report and "## Evidence" in report

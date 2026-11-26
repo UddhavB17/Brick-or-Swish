@@ -1,10 +1,10 @@
 """Token accounting for a review run.
 
-Records every payload an agent (or the umpire on its behalf) has to read: each
-Flagsmith CLI response, the agent-facing summary, and any LLM call's reported
-usage. Counts use tiktoken's o200k_base encoding when it is installed and fall
-back to the usual 4-characters-per-token estimate otherwise; the output says
-which.
+Records every payload read during a review: each Flagsmith CLI response (read by
+the umpire process, not by the agent), the summary the agent reads, and any LLM
+call's reported usage. Counts use tiktoken's o200k_base encoding, falling back
+to the usual 4-characters-per-token estimate when the encoding can't be loaded
+(it is downloaded on first use); the output says which.
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ import math
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
-try:  # optional: pip install 'third-umpire[tokens]'
+try:
     import tiktoken
 
     _ENCODING = tiktoken.get_encoding("o200k_base")

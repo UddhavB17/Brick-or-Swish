@@ -35,14 +35,13 @@ class RolloutPlan:
     def as_dict(self) -> dict[str, Any]:
         return {
             "environment": self.environment_name,
-            "experiment_id": self.experiment_id,
+            "production": self.production,
             "flag": self.feature_name,
             "variant": self.variant_key,
             "request": f"POST {self.path}",
             "body": self.body,
             "before": self.before,
             "after": self.after,
-            "confirm_phrase": self.confirm_phrase,
         }
 
 

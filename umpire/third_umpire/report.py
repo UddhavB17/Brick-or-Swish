@@ -177,8 +177,7 @@ def summary_json(ctx: Context, checks: list[Check], verdict: Verdict, explanatio
                        "flag": ctx.snap.experiment.feature_name, "environment": ctx.snap.environment.name},
         "claim": claim(ctx),
         "reasons": verdict.reasons,
-        "checks": [{"id": c.id, "status": c.status, "summary": c.summary} for c in checks if c.status != PASS],
-        "passed": [c.id for c in checks if c.status == PASS],
+        "checks": {c.id: c.status for c in checks},
     }
     if verdict.warnings:
         out["warnings"] = verdict.warnings
