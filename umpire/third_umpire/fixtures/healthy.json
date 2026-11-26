@@ -1,0 +1,1590 @@
+{
+ "name": "healthy",
+ "title": "30 hours, 50/50, pre-registered sample reached, clean audit log",
+ "now": "2026-11-27T15:42:00.000Z",
+ "environment_key": "bos7fYq2LkPz9mWcR4tXvH",
+ "experiment_id": 412,
+ "api": {
+  "api/v1/environments/bos7fYq2LkPz9mWcR4tXvH/": {
+   "id": 52011,
+   "uuid": "0c4b7a52-8f1e-4d2a-9b3c-5e6f7a8b9c0d",
+   "name": "Production",
+   "api_key": "bos7fYq2LkPz9mWcR4tXvH",
+   "description": "Real players only",
+   "project": 18842,
+   "minimum_change_request_approvals": null,
+   "allow_client_traits": true,
+   "banner_text": null,
+   "banner_colour": null,
+   "hide_disabled_flags": null,
+   "use_identity_composite_key_for_hashing": true,
+   "hide_sensitive_data": false,
+   "use_mv_v2_evaluation": true,
+   "use_identity_overrides_in_local_eval": false,
+   "is_creating": false,
+   "metadata": []
+  },
+  "api/v1/environments/bos7fYq2LkPz9mWcR4tXvH/experiments/": {
+   "count": 2,
+   "next": null,
+   "previous": null,
+   "results": [
+    {
+     "id": 412,
+     "feature": {
+      "id": 140233,
+      "name": "miss_feedback",
+      "type": "MULTIVARIATE",
+      "initial_value": "control",
+      "multivariate_options": [
+       {
+        "id": 77815,
+        "uuid": "3e9a1c7d-2b4f-4e8a-a1d3-7c5b9e0f2a64",
+        "type": "unicode",
+        "integer_value": null,
+        "string_value": "near_miss",
+        "boolean_value": null,
+        "default_percentage_allocation": 0.0,
+        "key": "near_miss"
+       }
+      ]
+     },
+     "name": "Near-miss feedback vs plain miss",
+     "hypothesis": "Showing near-miss feedback (exact timing error + ghost replay) after a missed shot increases the share of players who start a second round.",
+     "status": "running",
+     "metrics": [
+      {
+       "id": 1201,
+       "metric": 901,
+       "metric_name": "Second round started",
+       "aggregation": "occurrence",
+       "direction": "up",
+       "expected_direction": "increase",
+       "created_at": "2026-11-26T09:25:00.000Z"
+      },
+      {
+       "id": 1202,
+       "metric": 902,
+       "metric_name": "Quit within 10s of first miss",
+       "aggregation": "occurrence",
+       "direction": "down",
+       "expected_direction": "not_increase",
+       "created_at": "2026-11-26T09:25:00.000Z"
+      },
+      {
+       "id": 1203,
+       "metric": 903,
+       "metric_name": "Shots per session",
+       "aggregation": "mean",
+       "direction": "informational",
+       "expected_direction": "not_decrease",
+       "created_at": "2026-11-26T09:25:00.000Z"
+      }
+     ],
+     "experiment_rollout": {
+      "enabled": true,
+      "rollout_percentage": 100.0,
+      "feature_state_value": {
+       "type": "unicode",
+       "value": "control"
+      },
+      "multivariate_feature_state_values": [
+       {
+        "multivariate_feature_option": 77815,
+        "percentage_allocation": 50.0
+       }
+      ],
+      "audience": {
+       "match": "all",
+       "segments": []
+      }
+     },
+     "created_at": "2026-11-26T09:25:00.000Z",
+     "updated_at": "2026-11-26T09:30:00.000Z",
+     "started_at": "2026-11-26T09:30:00.000Z",
+     "ended_at": null,
+     "rollout_decision": null,
+     "rollout_variant": null
+    },
+    {
+     "id": 411,
+     "name": "A/A sanity check",
+     "status": "completed",
+     "started_at": "2026-11-26T08:21:00.000Z",
+     "feature": {
+      "id": 140234,
+      "name": "aa_sanity_check"
+     }
+    }
+   ]
+  },
+  "api/v1/environments/bos7fYq2LkPz9mWcR4tXvH/experiments/412/": {
+   "id": 412,
+   "feature": {
+    "id": 140233,
+    "name": "miss_feedback",
+    "type": "MULTIVARIATE",
+    "initial_value": "control",
+    "multivariate_options": [
+     {
+      "id": 77815,
+      "uuid": "3e9a1c7d-2b4f-4e8a-a1d3-7c5b9e0f2a64",
+      "type": "unicode",
+      "integer_value": null,
+      "string_value": "near_miss",
+      "boolean_value": null,
+      "default_percentage_allocation": 0.0,
+      "key": "near_miss"
+     }
+    ]
+   },
+   "name": "Near-miss feedback vs plain miss",
+   "hypothesis": "Showing near-miss feedback (exact timing error + ghost replay) after a missed shot increases the share of players who start a second round.",
+   "status": "running",
+   "metrics": [
+    {
+     "id": 1201,
+     "metric": 901,
+     "metric_name": "Second round started",
+     "aggregation": "occurrence",
+     "direction": "up",
+     "expected_direction": "increase",
+     "created_at": "2026-11-26T09:25:00.000Z"
+    },
+    {
+     "id": 1202,
+     "metric": 902,
+     "metric_name": "Quit within 10s of first miss",
+     "aggregation": "occurrence",
+     "direction": "down",
+     "expected_direction": "not_increase",
+     "created_at": "2026-11-26T09:25:00.000Z"
+    },
+    {
+     "id": 1203,
+     "metric": 903,
+     "metric_name": "Shots per session",
+     "aggregation": "mean",
+     "direction": "informational",
+     "expected_direction": "not_decrease",
+     "created_at": "2026-11-26T09:25:00.000Z"
+    }
+   ],
+   "experiment_rollout": {
+    "enabled": true,
+    "rollout_percentage": 100.0,
+    "feature_state_value": {
+     "type": "unicode",
+     "value": "control"
+    },
+    "multivariate_feature_state_values": [
+     {
+      "multivariate_feature_option": 77815,
+      "percentage_allocation": 50.0
+     }
+    ],
+    "audience": {
+     "match": "all",
+     "segments": []
+    }
+   },
+   "created_at": "2026-11-26T09:25:00.000Z",
+   "updated_at": "2026-11-26T09:30:00.000Z",
+   "started_at": "2026-11-26T09:30:00.000Z",
+   "ended_at": null,
+   "rollout_decision": null,
+   "rollout_variant": null
+  },
+  "api/v1/environments/bos7fYq2LkPz9mWcR4tXvH/experiment-metrics/": [
+   {
+    "id": 901,
+    "name": "Second round started",
+    "description": "",
+    "aggregation": "occurrence",
+    "direction": "up",
+    "definition": {
+     "version": 1,
+     "event": "second_round_started"
+    },
+    "experiments": [
+     412
+    ],
+    "created_at": "2026-11-26T08:10:00.000Z",
+    "updated_at": "2026-11-26T08:10:00.000Z"
+   },
+   {
+    "id": 902,
+    "name": "Quit within 10s of first miss",
+    "description": "",
+    "aggregation": "occurrence",
+    "direction": "down",
+    "definition": {
+     "version": 1,
+     "event": "quit_within_10s"
+    },
+    "experiments": [
+     412
+    ],
+    "created_at": "2026-11-26T08:10:00.000Z",
+    "updated_at": "2026-11-26T08:10:00.000Z"
+   },
+   {
+    "id": 903,
+    "name": "Shots per session",
+    "description": "",
+    "aggregation": "mean",
+    "direction": "informational",
+    "definition": {
+     "version": 1,
+     "event": "shots_taken"
+    },
+    "experiments": [
+     412
+    ],
+    "created_at": "2026-11-26T08:10:00.000Z",
+    "updated_at": "2026-11-26T08:10:00.000Z"
+   }
+  ],
+  "api/v1/environments/bos7fYq2LkPz9mWcR4tXvH/experiments/412/exposures/": {
+   "exposures": {
+    "as_of": "2026-11-27T15:30:00.000Z",
+    "last_error_at": null,
+    "refresh_requested_at": "2026-11-27T15:27:00.000Z",
+    "is_final": false,
+    "payload": {
+     "excluded_identities": 0,
+     "timeseries": {
+      "granularity": "hour",
+      "points": [
+       {
+        "bucket": "2026-11-26T09:00:00.000Z",
+        "new_identities": {
+         "control": 5,
+         "near_miss": 14
+        }
+       },
+       {
+        "bucket": "2026-11-26T10:00:00.000Z",
+        "new_identities": {
+         "control": 20,
+         "near_miss": 17
+        }
+       },
+       {
+        "bucket": "2026-11-26T11:00:00.000Z",
+        "new_identities": {
+         "control": 18,
+         "near_miss": 14
+        }
+       },
+       {
+        "bucket": "2026-11-26T12:00:00.000Z",
+        "new_identities": {
+         "control": 18,
+         "near_miss": 17
+        }
+       },
+       {
+        "bucket": "2026-11-26T13:00:00.000Z",
+        "new_identities": {
+         "control": 15,
+         "near_miss": 19
+        }
+       },
+       {
+        "bucket": "2026-11-26T14:00:00.000Z",
+        "new_identities": {
+         "control": 12,
+         "near_miss": 13
+        }
+       },
+       {
+        "bucket": "2026-11-26T15:00:00.000Z",
+        "new_identities": {
+         "control": 13,
+         "near_miss": 12
+        }
+       },
+       {
+        "bucket": "2026-11-26T16:00:00.000Z",
+        "new_identities": {
+         "control": 20,
+         "near_miss": 12
+        }
+       },
+       {
+        "bucket": "2026-11-26T17:00:00.000Z",
+        "new_identities": {
+         "control": 14,
+         "near_miss": 12
+        }
+       },
+       {
+        "bucket": "2026-11-26T18:00:00.000Z",
+        "new_identities": {
+         "control": 20,
+         "near_miss": 12
+        }
+       },
+       {
+        "bucket": "2026-11-26T19:00:00.000Z",
+        "new_identities": {
+         "control": 10,
+         "near_miss": 16
+        }
+       },
+       {
+        "bucket": "2026-11-26T20:00:00.000Z",
+        "new_identities": {
+         "control": 11,
+         "near_miss": 15
+        }
+       },
+       {
+        "bucket": "2026-11-26T21:00:00.000Z",
+        "new_identities": {
+         "control": 17,
+         "near_miss": 15
+        }
+       },
+       {
+        "bucket": "2026-11-26T22:00:00.000Z",
+        "new_identities": {
+         "control": 26,
+         "near_miss": 14
+        }
+       },
+       {
+        "bucket": "2026-11-26T23:00:00.000Z",
+        "new_identities": {
+         "control": 17,
+         "near_miss": 13
+        }
+       },
+       {
+        "bucket": "2026-11-27T00:00:00.000Z",
+        "new_identities": {
+         "control": 9,
+         "near_miss": 14
+        }
+       },
+       {
+        "bucket": "2026-11-27T01:00:00.000Z",
+        "new_identities": {
+         "control": 14,
+         "near_miss": 9
+        }
+       },
+       {
+        "bucket": "2026-11-27T02:00:00.000Z",
+        "new_identities": {
+         "control": 14,
+         "near_miss": 20
+        }
+       },
+       {
+        "bucket": "2026-11-27T03:00:00.000Z",
+        "new_identities": {
+         "control": 18,
+         "near_miss": 14
+        }
+       },
+       {
+        "bucket": "2026-11-27T04:00:00.000Z",
+        "new_identities": {
+         "control": 13,
+         "near_miss": 9
+        }
+       },
+       {
+        "bucket": "2026-11-27T05:00:00.000Z",
+        "new_identities": {
+         "control": 14,
+         "near_miss": 10
+        }
+       },
+       {
+        "bucket": "2026-11-27T06:00:00.000Z",
+        "new_identities": {
+         "control": 13,
+         "near_miss": 6
+        }
+       },
+       {
+        "bucket": "2026-11-27T07:00:00.000Z",
+        "new_identities": {
+         "control": 20,
+         "near_miss": 17
+        }
+       },
+       {
+        "bucket": "2026-11-27T08:00:00.000Z",
+        "new_identities": {
+         "control": 18,
+         "near_miss": 10
+        }
+       },
+       {
+        "bucket": "2026-11-27T09:00:00.000Z",
+        "new_identities": {
+         "control": 25,
+         "near_miss": 13
+        }
+       },
+       {
+        "bucket": "2026-11-27T10:00:00.000Z",
+        "new_identities": {
+         "control": 11,
+         "near_miss": 17
+        }
+       },
+       {
+        "bucket": "2026-11-27T11:00:00.000Z",
+        "new_identities": {
+         "control": 16,
+         "near_miss": 19
+        }
+       },
+       {
+        "bucket": "2026-11-27T12:00:00.000Z",
+        "new_identities": {
+         "control": 15,
+         "near_miss": 15
+        }
+       },
+       {
+        "bucket": "2026-11-27T13:00:00.000Z",
+        "new_identities": {
+         "control": 8,
+         "near_miss": 18
+        }
+       },
+       {
+        "bucket": "2026-11-27T14:00:00.000Z",
+        "new_identities": {
+         "control": 16,
+         "near_miss": 16
+        }
+       },
+       {
+        "bucket": "2026-11-27T15:00:00.000Z",
+        "new_identities": {
+         "control": 11,
+         "near_miss": 10
+        }
+       }
+      ]
+     }
+    }
+   }
+  },
+  "api/v1/environments/bos7fYq2LkPz9mWcR4tXvH/experiments/412/results/": {
+   "results": {
+    "as_of": "2026-11-27T15:30:00.000Z",
+    "last_error_at": null,
+    "refresh_requested_at": "2026-11-27T15:27:00.000Z",
+    "is_final": false,
+    "payload": {
+     "srm_p_value": null,
+     "metrics": [
+      {
+       "metric_id": 901,
+       "variants": {
+        "control": {
+         "n": 471,
+         "sum": 156.0,
+         "sum_squares": 156.0
+        },
+        "near_miss": {
+         "n": 432,
+         "sum": 192.0,
+         "sum_squares": 192.0
+        }
+       },
+       "inference": {
+        "near_miss": {
+         "lift": 0.3418803418803419,
+         "ci_low": 0.11876903923731291,
+         "ci_high": 0.5649916445233709,
+         "chance_to_win": 0.9986647135324533
+        }
+       },
+       "conversions_timeseries": {
+        "granularity": "hour",
+        "points": [
+         {
+          "bucket": "2026-11-26T09:00:00.000Z",
+          "converted_identities": {
+           "control": 3,
+           "near_miss": 4
+          }
+         },
+         {
+          "bucket": "2026-11-26T10:00:00.000Z",
+          "converted_identities": {
+           "control": 2,
+           "near_miss": 10
+          }
+         },
+         {
+          "bucket": "2026-11-26T11:00:00.000Z",
+          "converted_identities": {
+           "control": 6,
+           "near_miss": 8
+          }
+         },
+         {
+          "bucket": "2026-11-26T12:00:00.000Z",
+          "converted_identities": {
+           "control": 7,
+           "near_miss": 12
+          }
+         },
+         {
+          "bucket": "2026-11-26T13:00:00.000Z",
+          "converted_identities": {
+           "control": 7,
+           "near_miss": 5
+          }
+         },
+         {
+          "bucket": "2026-11-26T14:00:00.000Z",
+          "converted_identities": {
+           "control": 3,
+           "near_miss": 4
+          }
+         },
+         {
+          "bucket": "2026-11-26T15:00:00.000Z",
+          "converted_identities": {
+           "control": 5,
+           "near_miss": 8
+          }
+         },
+         {
+          "bucket": "2026-11-26T16:00:00.000Z",
+          "converted_identities": {
+           "control": 5,
+           "near_miss": 2
+          }
+         },
+         {
+          "bucket": "2026-11-26T17:00:00.000Z",
+          "converted_identities": {
+           "control": 4,
+           "near_miss": 8
+          }
+         },
+         {
+          "bucket": "2026-11-26T18:00:00.000Z",
+          "converted_identities": {
+           "control": 6,
+           "near_miss": 4
+          }
+         },
+         {
+          "bucket": "2026-11-26T19:00:00.000Z",
+          "converted_identities": {
+           "control": 3,
+           "near_miss": 6
+          }
+         },
+         {
+          "bucket": "2026-11-26T20:00:00.000Z",
+          "converted_identities": {
+           "control": 7,
+           "near_miss": 7
+          }
+         },
+         {
+          "bucket": "2026-11-26T21:00:00.000Z",
+          "converted_identities": {
+           "control": 7,
+           "near_miss": 7
+          }
+         },
+         {
+          "bucket": "2026-11-26T22:00:00.000Z",
+          "converted_identities": {
+           "control": 2,
+           "near_miss": 7
+          }
+         },
+         {
+          "bucket": "2026-11-26T23:00:00.000Z",
+          "converted_identities": {
+           "control": 7,
+           "near_miss": 8
+          }
+         },
+         {
+          "bucket": "2026-11-27T00:00:00.000Z",
+          "converted_identities": {
+           "control": 6,
+           "near_miss": 5
+          }
+         },
+         {
+          "bucket": "2026-11-27T01:00:00.000Z",
+          "converted_identities": {
+           "control": 6,
+           "near_miss": 8
+          }
+         },
+         {
+          "bucket": "2026-11-27T02:00:00.000Z",
+          "converted_identities": {
+           "control": 4,
+           "near_miss": 7
+          }
+         },
+         {
+          "bucket": "2026-11-27T03:00:00.000Z",
+          "converted_identities": {
+           "control": 5,
+           "near_miss": 4
+          }
+         },
+         {
+          "bucket": "2026-11-27T04:00:00.000Z",
+          "converted_identities": {
+           "control": 4,
+           "near_miss": 5
+          }
+         },
+         {
+          "bucket": "2026-11-27T05:00:00.000Z",
+          "converted_identities": {
+           "control": 2,
+           "near_miss": 6
+          }
+         },
+         {
+          "bucket": "2026-11-27T06:00:00.000Z",
+          "converted_identities": {
+           "control": 5,
+           "near_miss": 2
+          }
+         },
+         {
+          "bucket": "2026-11-27T07:00:00.000Z",
+          "converted_identities": {
+           "control": 10,
+           "near_miss": 8
+          }
+         },
+         {
+          "bucket": "2026-11-27T08:00:00.000Z",
+          "converted_identities": {
+           "control": 8,
+           "near_miss": 4
+          }
+         },
+         {
+          "bucket": "2026-11-27T09:00:00.000Z",
+          "converted_identities": {
+           "control": 10,
+           "near_miss": 4
+          }
+         },
+         {
+          "bucket": "2026-11-27T10:00:00.000Z",
+          "converted_identities": {
+           "control": 8,
+           "near_miss": 8
+          }
+         },
+         {
+          "bucket": "2026-11-27T11:00:00.000Z",
+          "converted_identities": {
+           "control": 3,
+           "near_miss": 3
+          }
+         },
+         {
+          "bucket": "2026-11-27T12:00:00.000Z",
+          "converted_identities": {
+           "control": 0,
+           "near_miss": 7
+          }
+         },
+         {
+          "bucket": "2026-11-27T13:00:00.000Z",
+          "converted_identities": {
+           "control": 4,
+           "near_miss": 10
+          }
+         },
+         {
+          "bucket": "2026-11-27T14:00:00.000Z",
+          "converted_identities": {
+           "control": 3,
+           "near_miss": 8
+          }
+         },
+         {
+          "bucket": "2026-11-27T15:00:00.000Z",
+          "converted_identities": {
+           "control": 4,
+           "near_miss": 3
+          }
+         }
+        ]
+       }
+      },
+      {
+       "metric_id": 902,
+       "variants": {
+        "control": {
+         "n": 471,
+         "sum": 120.0,
+         "sum_squares": 120.0
+        },
+        "near_miss": {
+         "n": 432,
+         "sum": 80.0,
+         "sum_squares": 80.0
+        }
+       },
+       "inference": {
+        "near_miss": {
+         "lift": -0.2731481481481482,
+         "ci_low": -0.4557655355759338,
+         "ci_high": -0.09053076072036256,
+         "chance_to_win": 0.9983138782652519
+        }
+       },
+       "conversions_timeseries": {
+        "granularity": "hour",
+        "points": [
+         {
+          "bucket": "2026-11-26T09:00:00.000Z",
+          "converted_identities": {
+           "control": 0,
+           "near_miss": 3
+          }
+         },
+         {
+          "bucket": "2026-11-26T10:00:00.000Z",
+          "converted_identities": {
+           "control": 6,
+           "near_miss": 3
+          }
+         },
+         {
+          "bucket": "2026-11-26T11:00:00.000Z",
+          "converted_identities": {
+           "control": 7,
+           "near_miss": 2
+          }
+         },
+         {
+          "bucket": "2026-11-26T12:00:00.000Z",
+          "converted_identities": {
+           "control": 1,
+           "near_miss": 1
+          }
+         },
+         {
+          "bucket": "2026-11-26T13:00:00.000Z",
+          "converted_identities": {
+           "control": 3,
+           "near_miss": 4
+          }
+         },
+         {
+          "bucket": "2026-11-26T14:00:00.000Z",
+          "converted_identities": {
+           "control": 3,
+           "near_miss": 5
+          }
+         },
+         {
+          "bucket": "2026-11-26T15:00:00.000Z",
+          "converted_identities": {
+           "control": 5,
+           "near_miss": 2
+          }
+         },
+         {
+          "bucket": "2026-11-26T16:00:00.000Z",
+          "converted_identities": {
+           "control": 3,
+           "near_miss": 3
+          }
+         },
+         {
+          "bucket": "2026-11-26T17:00:00.000Z",
+          "converted_identities": {
+           "control": 4,
+           "near_miss": 1
+          }
+         },
+         {
+          "bucket": "2026-11-26T18:00:00.000Z",
+          "converted_identities": {
+           "control": 5,
+           "near_miss": 1
+          }
+         },
+         {
+          "bucket": "2026-11-26T19:00:00.000Z",
+          "converted_identities": {
+           "control": 2,
+           "near_miss": 5
+          }
+         },
+         {
+          "bucket": "2026-11-26T20:00:00.000Z",
+          "converted_identities": {
+           "control": 1,
+           "near_miss": 5
+          }
+         },
+         {
+          "bucket": "2026-11-26T21:00:00.000Z",
+          "converted_identities": {
+           "control": 7,
+           "near_miss": 3
+          }
+         },
+         {
+          "bucket": "2026-11-26T22:00:00.000Z",
+          "converted_identities": {
+           "control": 9,
+           "near_miss": 4
+          }
+         },
+         {
+          "bucket": "2026-11-26T23:00:00.000Z",
+          "converted_identities": {
+           "control": 7,
+           "near_miss": 3
+          }
+         },
+         {
+          "bucket": "2026-11-27T00:00:00.000Z",
+          "converted_identities": {
+           "control": 3,
+           "near_miss": 2
+          }
+         },
+         {
+          "bucket": "2026-11-27T01:00:00.000Z",
+          "converted_identities": {
+           "control": 4,
+           "near_miss": 5
+          }
+         },
+         {
+          "bucket": "2026-11-27T02:00:00.000Z",
+          "converted_identities": {
+           "control": 2,
+           "near_miss": 2
+          }
+         },
+         {
+          "bucket": "2026-11-27T03:00:00.000Z",
+          "converted_identities": {
+           "control": 6,
+           "near_miss": 3
+          }
+         },
+         {
+          "bucket": "2026-11-27T04:00:00.000Z",
+          "converted_identities": {
+           "control": 3,
+           "near_miss": 1
+          }
+         },
+         {
+          "bucket": "2026-11-27T05:00:00.000Z",
+          "converted_identities": {
+           "control": 4,
+           "near_miss": 1
+          }
+         },
+         {
+          "bucket": "2026-11-27T06:00:00.000Z",
+          "converted_identities": {
+           "control": 4,
+           "near_miss": 0
+          }
+         },
+         {
+          "bucket": "2026-11-27T07:00:00.000Z",
+          "converted_identities": {
+           "control": 5,
+           "near_miss": 1
+          }
+         },
+         {
+          "bucket": "2026-11-27T08:00:00.000Z",
+          "converted_identities": {
+           "control": 7,
+           "near_miss": 2
+          }
+         },
+         {
+          "bucket": "2026-11-27T09:00:00.000Z",
+          "converted_identities": {
+           "control": 9,
+           "near_miss": 1
+          }
+         },
+         {
+          "bucket": "2026-11-27T10:00:00.000Z",
+          "converted_identities": {
+           "control": 0,
+           "near_miss": 3
+          }
+         },
+         {
+          "bucket": "2026-11-27T11:00:00.000Z",
+          "converted_identities": {
+           "control": 3,
+           "near_miss": 4
+          }
+         },
+         {
+          "bucket": "2026-11-27T12:00:00.000Z",
+          "converted_identities": {
+           "control": 1,
+           "near_miss": 3
+          }
+         },
+         {
+          "bucket": "2026-11-27T13:00:00.000Z",
+          "converted_identities": {
+           "control": 1,
+           "near_miss": 4
+          }
+         },
+         {
+          "bucket": "2026-11-27T14:00:00.000Z",
+          "converted_identities": {
+           "control": 5,
+           "near_miss": 2
+          }
+         },
+         {
+          "bucket": "2026-11-27T15:00:00.000Z",
+          "converted_identities": {
+           "control": 0,
+           "near_miss": 1
+          }
+         }
+        ]
+       }
+      },
+      {
+       "metric_id": 903,
+       "variants": {
+        "control": {
+         "n": 471,
+         "sum": 4294.0,
+         "sum_squares": 46662.0
+        },
+        "near_miss": {
+         "n": 432,
+         "sum": 4453.0,
+         "sum_squares": 52287.0
+        }
+       },
+       "inference": {
+        "near_miss": {
+         "lift": 0.13064903224137034,
+         "ci_low": 0.07072528125710517,
+         "ci_high": 0.1905727832256355,
+         "chance_to_win": 0.9999903665098404
+        }
+       },
+       "conversions_timeseries": null
+      }
+     ],
+     "exposures_timeseries": {
+      "granularity": "hour",
+      "points": [
+       {
+        "bucket": "2026-11-26T09:00:00.000Z",
+        "new_identities": {
+         "control": 5,
+         "near_miss": 14
+        }
+       },
+       {
+        "bucket": "2026-11-26T10:00:00.000Z",
+        "new_identities": {
+         "control": 20,
+         "near_miss": 17
+        }
+       },
+       {
+        "bucket": "2026-11-26T11:00:00.000Z",
+        "new_identities": {
+         "control": 18,
+         "near_miss": 14
+        }
+       },
+       {
+        "bucket": "2026-11-26T12:00:00.000Z",
+        "new_identities": {
+         "control": 18,
+         "near_miss": 17
+        }
+       },
+       {
+        "bucket": "2026-11-26T13:00:00.000Z",
+        "new_identities": {
+         "control": 15,
+         "near_miss": 19
+        }
+       },
+       {
+        "bucket": "2026-11-26T14:00:00.000Z",
+        "new_identities": {
+         "control": 12,
+         "near_miss": 13
+        }
+       },
+       {
+        "bucket": "2026-11-26T15:00:00.000Z",
+        "new_identities": {
+         "control": 13,
+         "near_miss": 12
+        }
+       },
+       {
+        "bucket": "2026-11-26T16:00:00.000Z",
+        "new_identities": {
+         "control": 20,
+         "near_miss": 12
+        }
+       },
+       {
+        "bucket": "2026-11-26T17:00:00.000Z",
+        "new_identities": {
+         "control": 14,
+         "near_miss": 12
+        }
+       },
+       {
+        "bucket": "2026-11-26T18:00:00.000Z",
+        "new_identities": {
+         "control": 20,
+         "near_miss": 12
+        }
+       },
+       {
+        "bucket": "2026-11-26T19:00:00.000Z",
+        "new_identities": {
+         "control": 10,
+         "near_miss": 16
+        }
+       },
+       {
+        "bucket": "2026-11-26T20:00:00.000Z",
+        "new_identities": {
+         "control": 11,
+         "near_miss": 15
+        }
+       },
+       {
+        "bucket": "2026-11-26T21:00:00.000Z",
+        "new_identities": {
+         "control": 17,
+         "near_miss": 15
+        }
+       },
+       {
+        "bucket": "2026-11-26T22:00:00.000Z",
+        "new_identities": {
+         "control": 26,
+         "near_miss": 14
+        }
+       },
+       {
+        "bucket": "2026-11-26T23:00:00.000Z",
+        "new_identities": {
+         "control": 17,
+         "near_miss": 13
+        }
+       },
+       {
+        "bucket": "2026-11-27T00:00:00.000Z",
+        "new_identities": {
+         "control": 9,
+         "near_miss": 14
+        }
+       },
+       {
+        "bucket": "2026-11-27T01:00:00.000Z",
+        "new_identities": {
+         "control": 14,
+         "near_miss": 9
+        }
+       },
+       {
+        "bucket": "2026-11-27T02:00:00.000Z",
+        "new_identities": {
+         "control": 14,
+         "near_miss": 20
+        }
+       },
+       {
+        "bucket": "2026-11-27T03:00:00.000Z",
+        "new_identities": {
+         "control": 18,
+         "near_miss": 14
+        }
+       },
+       {
+        "bucket": "2026-11-27T04:00:00.000Z",
+        "new_identities": {
+         "control": 13,
+         "near_miss": 9
+        }
+       },
+       {
+        "bucket": "2026-11-27T05:00:00.000Z",
+        "new_identities": {
+         "control": 14,
+         "near_miss": 10
+        }
+       },
+       {
+        "bucket": "2026-11-27T06:00:00.000Z",
+        "new_identities": {
+         "control": 13,
+         "near_miss": 6
+        }
+       },
+       {
+        "bucket": "2026-11-27T07:00:00.000Z",
+        "new_identities": {
+         "control": 20,
+         "near_miss": 17
+        }
+       },
+       {
+        "bucket": "2026-11-27T08:00:00.000Z",
+        "new_identities": {
+         "control": 18,
+         "near_miss": 10
+        }
+       },
+       {
+        "bucket": "2026-11-27T09:00:00.000Z",
+        "new_identities": {
+         "control": 25,
+         "near_miss": 13
+        }
+       },
+       {
+        "bucket": "2026-11-27T10:00:00.000Z",
+        "new_identities": {
+         "control": 11,
+         "near_miss": 17
+        }
+       },
+       {
+        "bucket": "2026-11-27T11:00:00.000Z",
+        "new_identities": {
+         "control": 16,
+         "near_miss": 19
+        }
+       },
+       {
+        "bucket": "2026-11-27T12:00:00.000Z",
+        "new_identities": {
+         "control": 15,
+         "near_miss": 15
+        }
+       },
+       {
+        "bucket": "2026-11-27T13:00:00.000Z",
+        "new_identities": {
+         "control": 8,
+         "near_miss": 18
+        }
+       },
+       {
+        "bucket": "2026-11-27T14:00:00.000Z",
+        "new_identities": {
+         "control": 16,
+         "near_miss": 16
+        }
+       },
+       {
+        "bucket": "2026-11-27T15:00:00.000Z",
+        "new_identities": {
+         "control": 11,
+         "near_miss": 10
+        }
+       }
+      ]
+     }
+    }
+   }
+  },
+  "api/v1/projects/18842/audit/": {
+   "count": 12,
+   "next": null,
+   "previous": null,
+   "results": [
+    {
+     "id": 5011,
+     "created_date": "2026-11-26T20:14:00.000Z",
+     "log": "Flag state updated for feature: aa_sanity_check",
+     "author": {
+      "id": 3301,
+      "email": "uddhav@brickorswish.dev",
+      "first_name": "Uddhav",
+      "last_name": "B",
+      "last_login": "2026-11-26T07:55:00Z",
+      "uuid": "6d3f8e1a-31c4-4b8e-9d55-0d2b7c9e4a10"
+     },
+     "organisation": {
+      "id": 9001,
+      "name": "Brick or Swish"
+     },
+     "environment": {
+      "id": 52010,
+      "name": "Development",
+      "api_key": "devK3yZ8wQ1rT5yU7iO9pA"
+     },
+     "project": {
+      "id": 18842,
+      "name": "Brick or Swish"
+     },
+     "related_object_id": 140234,
+     "related_object_uuid": null,
+     "related_object_type": "FEATURE_STATE",
+     "is_system_event": false
+    },
+    {
+     "id": 5010,
+     "created_date": "2026-11-26T09:30:01.000Z",
+     "log": "Experiment 'Near-miss feedback vs plain miss' rollout set to 100.0% of all identities",
+     "author": {
+      "id": 3301,
+      "email": "uddhav@brickorswish.dev",
+      "first_name": "Uddhav",
+      "last_name": "B",
+      "last_login": "2026-11-26T07:55:00Z",
+      "uuid": "6d3f8e1a-31c4-4b8e-9d55-0d2b7c9e4a10"
+     },
+     "organisation": {
+      "id": 9001,
+      "name": "Brick or Swish"
+     },
+     "environment": {
+      "id": 52011,
+      "name": "Production",
+      "api_key": "bos7fYq2LkPz9mWcR4tXvH"
+     },
+     "project": {
+      "id": 18842,
+      "name": "Brick or Swish"
+     },
+     "related_object_id": 412,
+     "related_object_uuid": null,
+     "related_object_type": "EXPERIMENT",
+     "is_system_event": false
+    },
+    {
+     "id": 5009,
+     "created_date": "2026-11-26T09:30:00.000Z",
+     "log": "Experiment 'Near-miss feedback vs plain miss' running for environment Production",
+     "author": {
+      "id": 3301,
+      "email": "uddhav@brickorswish.dev",
+      "first_name": "Uddhav",
+      "last_name": "B",
+      "last_login": "2026-11-26T07:55:00Z",
+      "uuid": "6d3f8e1a-31c4-4b8e-9d55-0d2b7c9e4a10"
+     },
+     "organisation": {
+      "id": 9001,
+      "name": "Brick or Swish"
+     },
+     "environment": {
+      "id": 52011,
+      "name": "Production",
+      "api_key": "bos7fYq2LkPz9mWcR4tXvH"
+     },
+     "project": {
+      "id": 18842,
+      "name": "Brick or Swish"
+     },
+     "related_object_id": 412,
+     "related_object_uuid": null,
+     "related_object_type": "EXPERIMENT",
+     "is_system_event": false
+    },
+    {
+     "id": 5008,
+     "created_date": "2026-11-26T09:25:00.000Z",
+     "log": "Experiment 'Near-miss feedback vs plain miss' created for environment Production",
+     "author": {
+      "id": 3301,
+      "email": "uddhav@brickorswish.dev",
+      "first_name": "Uddhav",
+      "last_name": "B",
+      "last_login": "2026-11-26T07:55:00Z",
+      "uuid": "6d3f8e1a-31c4-4b8e-9d55-0d2b7c9e4a10"
+     },
+     "organisation": {
+      "id": 9001,
+      "name": "Brick or Swish"
+     },
+     "environment": {
+      "id": 52011,
+      "name": "Production",
+      "api_key": "bos7fYq2LkPz9mWcR4tXvH"
+     },
+     "project": {
+      "id": 18842,
+      "name": "Brick or Swish"
+     },
+     "related_object_id": 412,
+     "related_object_uuid": null,
+     "related_object_type": "EXPERIMENT",
+     "is_system_event": false
+    },
+    {
+     "id": 5007,
+     "created_date": "2026-11-26T09:18:00.000Z",
+     "log": "Experiment 'A/A sanity check' completed for environment Production",
+     "author": {
+      "id": 3301,
+      "email": "uddhav@brickorswish.dev",
+      "first_name": "Uddhav",
+      "last_name": "B",
+      "last_login": "2026-11-26T07:55:00Z",
+      "uuid": "6d3f8e1a-31c4-4b8e-9d55-0d2b7c9e4a10"
+     },
+     "organisation": {
+      "id": 9001,
+      "name": "Brick or Swish"
+     },
+     "environment": {
+      "id": 52011,
+      "name": "Production",
+      "api_key": "bos7fYq2LkPz9mWcR4tXvH"
+     },
+     "project": {
+      "id": 18842,
+      "name": "Brick or Swish"
+     },
+     "related_object_id": 411,
+     "related_object_uuid": null,
+     "related_object_type": "EXPERIMENT",
+     "is_system_event": false
+    },
+    {
+     "id": 5006,
+     "created_date": "2026-11-26T08:21:00.000Z",
+     "log": "Experiment 'A/A sanity check' running for environment Production",
+     "author": {
+      "id": 3301,
+      "email": "uddhav@brickorswish.dev",
+      "first_name": "Uddhav",
+      "last_name": "B",
+      "last_login": "2026-11-26T07:55:00Z",
+      "uuid": "6d3f8e1a-31c4-4b8e-9d55-0d2b7c9e4a10"
+     },
+     "organisation": {
+      "id": 9001,
+      "name": "Brick or Swish"
+     },
+     "environment": {
+      "id": 52011,
+      "name": "Production",
+      "api_key": "bos7fYq2LkPz9mWcR4tXvH"
+     },
+     "project": {
+      "id": 18842,
+      "name": "Brick or Swish"
+     },
+     "related_object_id": 411,
+     "related_object_uuid": null,
+     "related_object_type": "EXPERIMENT",
+     "is_system_event": false
+    },
+    {
+     "id": 5005,
+     "created_date": "2026-11-26T08:20:00.000Z",
+     "log": "Experiment 'A/A sanity check' created for environment Production",
+     "author": {
+      "id": 3301,
+      "email": "uddhav@brickorswish.dev",
+      "first_name": "Uddhav",
+      "last_name": "B",
+      "last_login": "2026-11-26T07:55:00Z",
+      "uuid": "6d3f8e1a-31c4-4b8e-9d55-0d2b7c9e4a10"
+     },
+     "organisation": {
+      "id": 9001,
+      "name": "Brick or Swish"
+     },
+     "environment": {
+      "id": 52011,
+      "name": "Production",
+      "api_key": "bos7fYq2LkPz9mWcR4tXvH"
+     },
+     "project": {
+      "id": 18842,
+      "name": "Brick or Swish"
+     },
+     "related_object_id": 411,
+     "related_object_uuid": null,
+     "related_object_type": "EXPERIMENT",
+     "is_system_event": false
+    },
+    {
+     "id": 5004,
+     "created_date": "2026-11-26T08:10:40.000Z",
+     "log": "Metric 'Shots per session' created",
+     "author": {
+      "id": 3301,
+      "email": "uddhav@brickorswish.dev",
+      "first_name": "Uddhav",
+      "last_name": "B",
+      "last_login": "2026-11-26T07:55:00Z",
+      "uuid": "6d3f8e1a-31c4-4b8e-9d55-0d2b7c9e4a10"
+     },
+     "organisation": {
+      "id": 9001,
+      "name": "Brick or Swish"
+     },
+     "environment": {
+      "id": 52011,
+      "name": "Production",
+      "api_key": "bos7fYq2LkPz9mWcR4tXvH"
+     },
+     "project": {
+      "id": 18842,
+      "name": "Brick or Swish"
+     },
+     "related_object_id": 903,
+     "related_object_uuid": null,
+     "related_object_type": "METRIC",
+     "is_system_event": false
+    },
+    {
+     "id": 5003,
+     "created_date": "2026-11-26T08:10:20.000Z",
+     "log": "Metric 'Quit within 10s of first miss' created",
+     "author": {
+      "id": 3301,
+      "email": "uddhav@brickorswish.dev",
+      "first_name": "Uddhav",
+      "last_name": "B",
+      "last_login": "2026-11-26T07:55:00Z",
+      "uuid": "6d3f8e1a-31c4-4b8e-9d55-0d2b7c9e4a10"
+     },
+     "organisation": {
+      "id": 9001,
+      "name": "Brick or Swish"
+     },
+     "environment": {
+      "id": 52011,
+      "name": "Production",
+      "api_key": "bos7fYq2LkPz9mWcR4tXvH"
+     },
+     "project": {
+      "id": 18842,
+      "name": "Brick or Swish"
+     },
+     "related_object_id": 902,
+     "related_object_uuid": null,
+     "related_object_type": "METRIC",
+     "is_system_event": false
+    },
+    {
+     "id": 5002,
+     "created_date": "2026-11-26T08:10:00.000Z",
+     "log": "Metric 'Second round started' created",
+     "author": {
+      "id": 3301,
+      "email": "uddhav@brickorswish.dev",
+      "first_name": "Uddhav",
+      "last_name": "B",
+      "last_login": "2026-11-26T07:55:00Z",
+      "uuid": "6d3f8e1a-31c4-4b8e-9d55-0d2b7c9e4a10"
+     },
+     "organisation": {
+      "id": 9001,
+      "name": "Brick or Swish"
+     },
+     "environment": {
+      "id": 52011,
+      "name": "Production",
+      "api_key": "bos7fYq2LkPz9mWcR4tXvH"
+     },
+     "project": {
+      "id": 18842,
+      "name": "Brick or Swish"
+     },
+     "related_object_id": 901,
+     "related_object_uuid": null,
+     "related_object_type": "METRIC",
+     "is_system_event": false
+    },
+    {
+     "id": 5001,
+     "created_date": "2026-11-26T08:03:00.000Z",
+     "log": "Flag / Remote Config updated: miss_feedback",
+     "author": {
+      "id": 3301,
+      "email": "uddhav@brickorswish.dev",
+      "first_name": "Uddhav",
+      "last_name": "B",
+      "last_login": "2026-11-26T07:55:00Z",
+      "uuid": "6d3f8e1a-31c4-4b8e-9d55-0d2b7c9e4a10"
+     },
+     "organisation": {
+      "id": 9001,
+      "name": "Brick or Swish"
+     },
+     "environment": null,
+     "project": {
+      "id": 18842,
+      "name": "Brick or Swish"
+     },
+     "related_object_id": 140233,
+     "related_object_uuid": null,
+     "related_object_type": "FEATURE",
+     "is_system_event": false
+    },
+    {
+     "id": 5000,
+     "created_date": "2026-11-26T08:02:00.000Z",
+     "log": "New Flag / Remote Config created: miss_feedback",
+     "author": {
+      "id": 3301,
+      "email": "uddhav@brickorswish.dev",
+      "first_name": "Uddhav",
+      "last_name": "B",
+      "last_login": "2026-11-26T07:55:00Z",
+      "uuid": "6d3f8e1a-31c4-4b8e-9d55-0d2b7c9e4a10"
+     },
+     "organisation": {
+      "id": 9001,
+      "name": "Brick or Swish"
+     },
+     "environment": null,
+     "project": {
+      "id": 18842,
+      "name": "Brick or Swish"
+     },
+     "related_object_id": 140233,
+     "related_object_uuid": null,
+     "related_object_type": "FEATURE",
+     "is_system_event": false
+    }
+   ]
+  }
+ }
+}
