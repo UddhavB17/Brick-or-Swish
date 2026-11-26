@@ -7,12 +7,12 @@ Measured by `scripts/measure-tokens` on 2026-11-26, counted with tiktoken o200k_
 | Step | What the agent reads | Tokens |
 | --- | --- | ---: |
 | Startup, always loaded | `name` and `description` | 213 |
-| Activation | SKILL.md body | 1,192 |
+| Activation | SKILL.md body | 1,307 |
 | Preflight | `scripts/preflight` | 123 |
 | Refuse the bad result (exit 2) | `scripts/umpire review --fixture bad-peeking --json` | 543 |
 | Review the healthy result (exit 4) | `scripts/umpire review --fixture healthy --json` | 524 |
 | Approve with the human's phrase (exit 0) | `scripts/umpire review --fixture healthy --json --approve "ship near_miss to 100% in Production"` | 500 |
-| **Total** | | **3,095** |
+| **Total** | | **3,210** |
 
 ## What it never reads
 

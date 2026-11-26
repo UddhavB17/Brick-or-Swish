@@ -8,22 +8,28 @@ metadata:
   source: https://github.com/UddhavB17/Brick-or-Swish
 ---
 
-# Third Umpire
+# third-umpire
 
-The umpire reads the experiment through the Flagsmith CLI, runs every check in code and decides. You run it, relay the verdict, and carry the human's approval. Paths below are relative to this skill's directory.
+The umpire reads the experiment through the Flagsmith CLI, runs every check in code and decides. You run it, relay the verdict, and carry the human's approval. Paths are relative to this skill's directory.
 
-## Rules
+## When to use
 
-- The verdict is the umpire's. Don't overrule it, soften it or re-derive it from the numbers.
-- Pass `--approve` only with a phrase the human typed in this conversation, word for word. "Yes", "go ahead" or "ship it" are not approval. The JSON contains the phrase so you can show it, not so you can use it.
-- Never write to Flagsmith yourself (no `flagsmith api ... -X POST/PUT/PATCH/DELETE`, no flag or experiment edits). The umpire's gated `complete/` call is the only write this skill makes.
-- Never put API keys on the command line. The CLI reads `flagsmith login` or `FLAGSMITH_API_KEY`.
-- If you are unsure, use `--dry-run`. It prints the exact request and sends nothing.
+- "Can we ship the winner?", "Is this A/B result real?", "End the experiment and roll out the variant."
+- Before ending any Flagsmith experiment or changing its flag because of its result.
+
+## Inputs
+
+| Input | Required | Description |
+| --- | --- | --- |
+| Environment key | Yes | Client-side key of the environment running the experiment: `-e <key>` or `FLAGSMITH_ENVIRONMENT` |
+| Experiment id | If more than one is running | `--experiment <id>`. `scripts/umpire list -e <key>` shows them |
+| Pre-registration | Yes | HYPOTHESIS.md in or above the working directory, or `--hypothesis <path>` |
+| Credentials | Yes | `flagsmith login`, or `FLAGSMITH_API_KEY` set to a Master API key |
 
 ## Workflow
 
-1. Preflight: `scripts/preflight`. Fix any `BLOCKER` line before a live review (`note` lines are fine).
-2. Review: `scripts/umpire review -e <client-side environment key> --json`. Add `--experiment <id>` if more than one is running (`scripts/umpire list -e <key>` shows them) and `--hypothesis <path>` if HYPOTHESIS.md isn't in or above the working directory. Read stdout only; never fetch the raw experiment data yourself.
+1. `scripts/preflight`. Fix any `BLOCKER` line before a live review (`note` lines are fine).
+2. `scripts/umpire review -e <key> --json`. Read stdout only, one JSON line. Don't fetch experiment data yourself.
 3. Act on the exit code:
 
 | Exit | Meaning | What you do |
@@ -34,9 +40,11 @@ The umpire reads the experiment through the Flagsmith CLI, runs every check in c
 | 0 | SHIP, done (`applied`, `simulated` for fixtures, or `dry-run`) | Report the outcome; `applied` includes `status_after`. |
 | 1 | Error | Show stderr. 401: run `flagsmith login`. 404: wrong environment key or experiment id. |
 
-4. Approve: only after the human types the phrase, run the same review again with `--approve "<their phrase>"`. The umpire re-runs every check and re-reads the experiment before it writes. If anything moved, the outcome is `stale` (exit 4): show the new plan and ask again.
+4. Only after the human types the phrase, run the same review with `--approve "<their phrase>"`. The umpire re-runs every check and re-reads the experiment before it writes. If anything moved, the outcome is `stale`: show the new plan and ask again.
 
-A `--json` run prints one line. Trimmed (real output has more fields):
+## Outputs
+
+Trimmed `--json` line (real output has more fields):
 
 ```json
 {"verdict":"SHIP","headline":"Ship near_miss. Every check that could block it passed.",
@@ -51,22 +59,30 @@ A `--json` run prints one line. Trimmed (real output has more fields):
  "explanation":{"source":"template","text":"Ship near_miss. It beats control ..."}}
 ```
 
-`explanation.text` is a plain-English summary you can relay. It comes from an LLM when `UMPIRE_LLM_PROVIDER` (`openai`, `anthropic`, `xai`) and a key are set, otherwise from a template. Either way it is checked against the verdict and can't change it.
+`explanation.text` is a plain-English summary you can relay. An LLM writes it when `UMPIRE_LLM_PROVIDER` (`openai`, `anthropic`, `xai`) and a key are set, otherwise a template does. Either way it is checked against the verdict and can't change it. A markdown report is also written to `umpire-reports/` (path in `report`).
+
+## What NOT to do
+
+- **Do NOT** overrule, soften or re-derive the verdict from the numbers.
+- **Do NOT** pass `--approve` with a phrase the human didn't type in this conversation, word for word. "Yes", "go ahead" or "ship it" are not approval. The JSON carries the phrase so you can show it, not so you can use it.
+- **Do NOT** write to Flagsmith yourself (`flagsmith api ... -X POST/PUT/PATCH/DELETE`, flag or experiment edits). The umpire's gated `complete/` call is the only write.
+- **Do NOT** put API keys on the command line.
+- If unsure, use `--dry-run`: it prints the exact request and sends nothing.
 
 ## Without a Flagsmith account
 
-Fixtures replay recorded experiments, and approving one simulates the write:
+Fixtures replay recorded experiments. Approving one simulates the write.
 
 ```bash
 scripts/umpire fixtures                                  # list them
-scripts/umpire review --fixture bad-peeking --json       # exit 2: refused, 99.8% chance notwithstanding
+scripts/umpire review --fixture bad-peeking --json       # exit 2: refused despite a 99.8% chance to win
 scripts/umpire review --fixture healthy --json           # exit 4: awaiting approval
 scripts/umpire review --fixture healthy --json --approve "ship near_miss to 100% in Production"
 ```
 
-For a human watching, drop `--json` to get the full umpire's report in the terminal.
+Without `--json` the umpire prints its full report for a human watching the terminal.
 
-## More
+## Related files
 
 - [references/CHECKS.md](references/CHECKS.md): what each check tests, its thresholds, and how the verdict is chosen.
 - [references/FLAGSMITH-API.md](references/FLAGSMITH-API.md): the CLI commands, endpoints and `--jq` projections used, auth, and Flagsmith quirks.
