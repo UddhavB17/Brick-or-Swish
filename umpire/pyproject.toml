@@ -19,7 +19,7 @@ build-backend = "setuptools.build_meta"
 include = ["third_umpire*"]
 
 [tool.setuptools.package-data]
-third_umpire = ["fixtures/*.json"]
+third_umpire = ["fixtures/*.json", "fixtures/*.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
