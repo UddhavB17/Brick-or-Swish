@@ -274,9 +274,17 @@ Simulated results are a pipeline demo, not evidence about players.
 - [ ] No edits to the flag while the experiment runs.
 - [ ] Simulated traffic only in `Demo`.
 
-## Phase 2: Third Umpire (not built yet)
+## 11. Review before ending: Third Umpire
 
-A Python + Flagsmith CLI agent, packaged as an agentskills.io Agent Skill, that audits a running experiment and asks a
-human before acting: sample-ratio mismatch, peeking against the stopping rule, guardrail breaches, novelty effects and
-any post-launch edits to the flag, metrics or rollout. It reads only what this setup creates: the experiment, its
-metrics, exposures and results endpoints, and the audit trail. See `HANDOFF.md` for where it plugs in.
+Instead of reading the dashboard and running the `complete/` command by hand, let the umpire apply the stopping rule:
+
+```bash
+export FLAGSMITH_ENVIRONMENT=<Production client-side key>   # plus `flagsmith login` or FLAGSMITH_API_KEY
+cd umpire && uv run third-umpire review --dry-run            # verdict and the exact command, nothing sent
+uv run third-umpire review                                   # same, then asks before ending the experiment
+```
+
+It reads the experiment, metrics, exposures, results and the project audit log through `flagsmith api`, so it needs
+the same credentials as the commands above. The audit log needs a plan that includes it; without one the edits check
+shows WARN. Commands and projections are listed in
+[FLAGSMITH-API.md](../skills/third-umpire/references/FLAGSMITH-API.md).

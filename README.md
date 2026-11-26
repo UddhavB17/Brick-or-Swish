@@ -3,7 +3,9 @@
 **A one-button neon basketball game that is also a real A/B test.** Five free throws, one button, and a Flagsmith
 experiment on the moment that decides whether a player comes back: the miss.
 
-Built for the WeMakeDevs × Flagsmith **Toggle Wars** hackathon, Track 01 (Flagsmith Experimentation).
+Built for the WeMakeDevs × Flagsmith **Toggle Wars** hackathon: Track 01 (Flagsmith Experimentation) with the game,
+and Tracks 02 and 04 with [Third Umpire](#tracks-02-and-04-third-umpire), an agent and Agent Skill that reviews the
+result before anyone ships it.
 
 <p align="center">
   <img src="docs/screenshots/gameplay.gif" alt="Gameplay: hold, release in the green, swish, then a near-miss screen with timing error and ghost ball" width="270">
@@ -161,14 +163,111 @@ src/
 scripts/
   simulate-traffic.mjs SIMULATED traffic (Node SDK)
   e2e/                 Flagsmith wiring check and screenshot capture (Chrome)
+umpire/                Third Umpire: Python CLI over the Flagsmith CLI, fixtures, tests
+skills/third-umpire/   the same workflow as an Agent Skill
 ```
 
-## Phase 2: Third Umpire
+## Tracks 02 and 04: Third Umpire
 
-Next up is an AI "Third Umpire": a Python + Flagsmith CLI agent, packaged as an agentskills.io Agent Skill, that audits
-the running experiment against [HYPOTHESIS.md](HYPOTHESIS.md) (sample ratio mismatch, peeking, guardrail breaches, novelty
-effects, post-launch edits) and asks a human before acting. The experiment client and event contract are kept in one
-place so it can audit them without touching the game.
+A 99% chance to win is not a reason to ship. It can come from a broken split, from peeking after nine hours, or from
+someone editing the rollout mid-test. **Third Umpire** reviews a Flagsmith experiment before anyone ships the winner:
+it reads everything through the Flagsmith CLI, runs deterministic checks against the pre-registration in
+[HYPOTHESIS.md](HYPOTHESIS.md), and calls **SHIP**, **DON'T SHIP** or **KEEP RUNNING**. The only write it can make
+(ending the experiment with the winner at 100%) waits for a human to approve the exact change.
+
+- **Track 02 (agent):** [`umpire/`](umpire/), a Python CLI on top of the official Flagsmith CLI.
+- **Track 04 (Agent Skill):** [`skills/third-umpire/`](skills/third-umpire/SKILL.md), the same workflow as an
+  [agentskills.io](https://agentskills.io/specification) skill for coding agents.
+
+| Planted bad result: refused | Healthy result: approved, rolled out through the Flagsmith CLI |
+| --- | --- |
+| <img src="docs/screenshots/umpire-refused.png" alt="Third Umpire refusing a 99.8% result: SRM, users in both variants, four post-launch edits, peeking and a novelty effect" width="420"> | <img src="docs/screenshots/umpire-approved.png" alt="Third Umpire approving the healthy result: every check passes, the human approval panel shows the exact Flagsmith CLI command, then Applied" width="420"> |
+
+```mermaid
+flowchart LR
+  H[HYPOTHESIS.md] --> C
+  F[(Flagsmith)] -- "flagsmith api --jq" --> C[Deterministic checks]
+  C --> V{SHIP / DON'T SHIP / KEEP RUNNING}
+  V --> R[Terminal + markdown report]
+  V -. facts only .-> L[Optional LLM explainer] -. plain English .-> R
+  V -- SHIP --> G[Human approval]
+  G -- approved --> W["flagsmith api .../complete/ -X POST"] --> F
+  A[Coding agent] -- skills/third-umpire --> C
+```
+
+**What it checks.** Each check returns PASS, WARN or FAIL with its numbers, and code, not a model, makes the call.
+
+- **Validity:**
+  - sample ratio mismatch, recomputed against the experiment's own split, because Flagsmith's SRM test reads the
+    environment default and stays silent here;
+  - users exposed to both variants;
+  - an arm that stops receiving exposures;
+  - conversions flatlining while exposures grow;
+  - edits to the flag, experiment, rollout or metrics in the audit log after launch.
+- **Readiness:** the pre-registered sample size and runtime.
+- **Decision:**
+  - the 95% credible interval against zero, re-derived from Flagsmith's raw sums;
+  - the `quit_within_10s` guardrail;
+  - an early-vs-late novelty split;
+  - the pre-registered stopping rule.
+
+Details and thresholds are in [CHECKS.md](skills/third-umpire/references/CHECKS.md).
+
+**Safety.**
+- Nothing is written without a SHIP verdict and a human approving the exact change: `y`, then the environment's name
+  for production, or `--approve "ship near_miss to 100% in Production"` typed by a human when an agent drives it.
+- `--dry-run` prints the exact `flagsmith api` command and sends nothing.
+- The experiment is re-read just before writing, and the umpire refuses if anything moved since the review.
+- The optional LLM (OpenAI, Anthropic or xAI, set with `UMPIRE_LLM_PROVIDER` and `UMPIRE_LLM_API_KEY`) only rewords
+  the facts. Its text is checked against the verdict and falls back to a template, so it can never change the call.
+
+### Run it
+
+Needs [uv](https://docs.astral.sh/uv/) (or Python 3.10+) and, for live runs, the
+[Flagsmith CLI](https://docs.flagsmith.com/integrating-with-flagsmith/flagsmith-cli) v2.
+
+```bash
+cd umpire
+uv run third-umpire review --fixture bad-peeking      # planted bad result: DON'T SHIP (exit 2)
+uv run third-umpire review --fixture healthy          # SHIP; approve at the prompt (fixture writes are simulated)
+uv run third-umpire review --fixture keep-running     # clean but too early: KEEP RUNNING (exit 3)
+```
+
+Against the live experiment:
+
+```bash
+flagsmith login                                    # or: export FLAGSMITH_API_KEY=<Master API key>
+export FLAGSMITH_ENVIRONMENT=<Production client-side key>
+uv run third-umpire list                           # experiments in the environment
+uv run third-umpire review --dry-run               # the one running experiment; show the rollout, send nothing
+uv run third-umpire review                         # same, then ask before rolling out
+```
+
+Through the real Flagsmith CLI against a local mock of the API (what the recording shows):
+
+```bash
+uv run third-umpire serve-fixture healthy --port 8765 &
+export FLAGSMITH_API_URL=http://127.0.0.1:8765 FLAGSMITH_API_KEY_127_0_0_1_8765=mock.third-umpire-demo
+uv run third-umpire review -e bos7fYq2LkPz9mWcR4tXvH
+```
+
+Each review also writes a markdown report to `umpire-reports/`. Exit codes: 0 ship (applied or dry run), 2 don't ship,
+3 keep running, 4 ship awaiting approval, 1 error. `uv run --extra test pytest` runs the 114 tests: every check has
+passing and failing cases, and one suite drives the real Flagsmith CLI against the mock API.
+
+### As an Agent Skill
+
+Copy or symlink `skills/third-umpire` into your agent's skills folder, for example `.claude/skills/` or
+`.cursor/skills/`. Inside this repo its launcher runs `umpire/` directly, and anywhere else it installs it from GitHub
+with `uvx`. The agent runs `scripts/preflight`, then `scripts/umpire review --json`, relays the verdict by exit code,
+and passes `--approve` only with a phrase the human typed. The skill validates with
+`uvx --from skills-ref agentskills validate skills/third-umpire`.
+
+It is built to be cheap: a full demo run (activation, preflight, refusing the bad result, reviewing and approving the
+healthy one) puts **3,210 tokens** in the agent's context. The umpire reads about 8,000 tokens of raw API responses per
+review itself, and the agent only sees a ~500-token summary. `skills/third-umpire/scripts/measure-tokens` re-measures
+this, and `--token-log FILE` records the count for any run, including a live one
+([TOKENS.md](skills/third-umpire/references/TOKENS.md)).
 
 ## AI tools used
 
