@@ -28,3 +28,12 @@ coverage/
 
 # Flagsmith CLI binding (per developer)
 flagsmith.json
+
+# Python (Third Umpire)
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+*.egg-info/
+build/
+umpire-reports/

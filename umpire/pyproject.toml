@@ -1,0 +1,27 @@
+[project]
+name = "third-umpire"
+version = "0.1.0"
+description = "Puts a Flagsmith A/B result on review before anyone ships the winner."
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = ["rich>=13.7"]
+
+[project.optional-dependencies]
+test = ["pytest>=8"]
+tokens = ["tiktoken>=0.7"]
+
+[project.scripts]
+third-umpire = "third_umpire.cli:main"
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["third_umpire*"]
+
+[tool.setuptools.package-data]
+third_umpire = ["fixtures/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
