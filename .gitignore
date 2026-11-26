@@ -25,3 +25,6 @@ coverage/
 # Agent / local artifacts (keep docs screenshots)
 .cursor/
 *.tsbuildinfo
+
+# Flagsmith CLI binding (per developer)
+flagsmith.json
