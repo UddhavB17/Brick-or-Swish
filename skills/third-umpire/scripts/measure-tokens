@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+"""Measures the tokens a complete demo run of this skill puts in an agent's context.
+
+Runs the same steps an agent follows (activate, preflight, refuse the planted bad
+result, review the healthy one, approve it with the human's phrase) against the
+bundled fixtures, counts what each step prints, and prints a markdown report:
+
+    scripts/measure-tokens > references/TOKENS.md
+
+When the Flagsmith CLI is installed it also replays one review through the real
+CLI against the local mock API to measure the --jq projections. No account or
+network access to Flagsmith is needed.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import shutil
+import socket
+import subprocess
+import sys
+import tempfile
+import time
+from datetime import date
+from pathlib import Path
+
+SCRIPTS = Path(__file__).resolve().parent
+SKILL = SCRIPTS.parent
+UMPIRE = str(SCRIPTS / "umpire")
+QUIET = {**os.environ, "UMPIRE_LLM_PROVIDER": "none", "NO_COLOR": "1", "COLUMNS": "100"}
+
+
+def run(args: list[str], env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
+    return subprocess.run(args, capture_output=True, text=True, env=env or QUIET, stdin=subprocess.DEVNULL)
+
+
+def count(text: str) -> int:
+    out = subprocess.run([UMPIRE, "count-tokens"], input=text, capture_output=True, text=True, check=True)
+    return int(out.stdout.split()[0])
+
+
+def method() -> str:
+    out = subprocess.run([UMPIRE, "count-tokens"], input="", capture_output=True, text=True, check=True)
+    return out.stderr.strip().removeprefix("method: ")
+
+
+def ledger(path: Path) -> dict[str, int]:
+    return json.loads(path.read_text())["totals"]
+
+
+def free_port() -> int:
+    with socket.socket() as s:
+        s.bind(("127.0.0.1", 0))
+        return s.getsockname()[1]
+
+
+def projected_via_cli(tmp: Path) -> int | None:
+    """Tokens of the Flagsmith CLI's --jq output for one live-mode review of the healthy fixture."""
+    if not shutil.which("flagsmith"):
+        return None
+    port = free_port()
+    server = subprocess.Popen([UMPIRE, "serve-fixture", "healthy", "--port", str(port)],
+                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    try:
+        for _ in range(50):
+            try:
+                socket.create_connection(("127.0.0.1", port), timeout=0.2).close()
+                break
+            except OSError:
+                time.sleep(0.1)
+        host = f"FLAGSMITH_API_KEY_127_0_0_1_{port}"
+        env = {**QUIET, "FLAGSMITH_API_URL": f"http://127.0.0.1:{port}", host: "mock.third-umpire-demo"}
+        log = tmp / "live.json"
+        run([UMPIRE, "review", "-e", "bos7fYq2LkPz9mWcR4tXvH", "--experiment", "412", "--json", "--no-report",
+             "--no-gate", "--token-log", str(log)], env)
+        return ledger(log).get("flagsmith-cli") if log.exists() else None
+    finally:
+        server.terminate()
+        server.wait()
+
+
+def main() -> int:
+    text = (SKILL / "SKILL.md").read_text(encoding="utf-8")
+    _, frontmatter, body = text.split("---\n", 2)
+    tmp = Path(tempfile.mkdtemp())
+    rows: list[tuple[str, str, int]] = [
+        ("Startup, always loaded", "`name` and `description`", count(frontmatter)),
+        ("Activation", "SKILL.md body", count(body)),
+    ]
+
+    pre = run([str(SCRIPTS / "preflight")])
+    rows.append(("Preflight", "`scripts/preflight`", count(pre.stdout + pre.stderr)))
+
+    review = [UMPIRE, "review", "--json", "--no-report", "--fixture"]
+    bad = run([*review, "bad-peeking", "--token-log", str(tmp / "bad.json")])
+    rows.append((f"Refuse the bad result (exit {bad.returncode})",
+                 "`scripts/umpire review --fixture bad-peeking --json`", count(bad.stdout + bad.stderr)))
+
+    good = run([*review, "healthy", "--token-log", str(tmp / "healthy.json")])
+    rows.append((f"Review the healthy result (exit {good.returncode})",
+                 "`scripts/umpire review --fixture healthy --json`", count(good.stdout + good.stderr)))
+
+    phrase = json.loads(good.stdout)["approval"]["confirm_phrase"]
+    ok = run([*review, "healthy", "--approve", phrase, "--token-log", str(tmp / "approve.json")])
+    rows.append((f"Approve with the human's phrase (exit {ok.returncode})",
+                 f'`scripts/umpire review --fixture healthy --json --approve "{phrase}"`',
+                 count(ok.stdout + ok.stderr)))
+
+    raw = ledger(tmp / "healthy.json").get("flagsmith-cli", 0)
+    summary = ledger(tmp / "healthy.json").get("agent-output", 0)
+    projected = projected_via_cli(tmp)
+    shutil.rmtree(tmp, ignore_errors=True)
+
+    total = sum(n for *_, n in rows)
+    print("# Token cost of a demo run\n")
+    print(f"Measured by `scripts/measure-tokens` on {date.today().isoformat()}, counted with {method()}. "
+          "Re-run it after changing SKILL.md or the review output.\n")
+    print("## What lands in the agent's context\n")
+    print("| Step | What the agent reads | Tokens |\n| --- | --- | ---: |")
+    for step, what, n in rows:
+        print(f"| {step} | {what} | {n:,} |")
+    print(f"| **Total** | | **{total:,}** |\n")
+    print("## What it never reads\n")
+    print("The umpire process reads Flagsmith itself and hands the agent a summary. For one review of the "
+          "healthy fixture:\n")
+    print("| Payload | Tokens |\n| --- | ---: |")
+    print("| Raw API responses as stored in the fixture (environment, metrics, experiment, exposures, results, "
+          f"audit log) | {raw:,} |")
+    if projected is not None:
+        print(f"| The same responses after the `--jq` projections, through the real Flagsmith CLI | {projected:,} |")
+    print(f"| The JSON summary the agent reads instead | {summary:,} |\n")
+    print("No LLM was called (`UMPIRE_LLM_PROVIDER=none`). With a provider configured, `--token-log` also "
+          "records the prompt and completion tokens the provider reports.\n")
+    print("Record a live run the same way:\n")
+    print("```bash\nscripts/umpire review -e \"$FLAGSMITH_ENVIRONMENT\" --json --token-log tokens.json\n```")
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())
