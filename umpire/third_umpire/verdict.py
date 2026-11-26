@@ -99,7 +99,8 @@ def decide(checks: list[Check], ctx: Context) -> Verdict:
         return Verdict(
             KEEP_RUNNING,
             "Not yet. The pre-registered sample size or runtime isn't reached.",
-            [sample.summary, f"The current {_chance(ctx)} chance to win is not a decision under the pre-registered rule."],
+            [sample.summary,
+             f"The current {_chance(ctx)} chance to win is not a decision under the pre-registered rule."],
             warnings,
         )
 

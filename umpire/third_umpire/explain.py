@@ -89,8 +89,11 @@ def facts(ctx: Context, checks: list[Check], verdict: Verdict) -> dict[str, Any]
         "checks": [{"check": c.title, "status": c.status, "finding": c.summary} for c in checks],
     }
     if inf:
-        out["primary_result"] = {"lift": pct(inf.lift, True), "interval": [pct(inf.ci_low, True), pct(inf.ci_high, True)],
-                                 "chance_to_beat_control": pct(inf.chance_to_win)}
+        out["primary_result"] = {
+            "lift": pct(inf.lift, True),
+            "interval": [pct(inf.ci_low, True), pct(inf.ci_high, True)],
+            "chance_to_beat_control": pct(inf.chance_to_win),
+        }
     if verdict.plan:
         out["if_approved"] = verdict.plan.after
     return out

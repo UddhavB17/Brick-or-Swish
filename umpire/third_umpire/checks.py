@@ -387,7 +387,9 @@ def check_conversion_wiring(ctx: Context) -> Check:
         )
         if expected >= WIRING_MIN_EXPECTED and c_tail == 0:
             statuses.append(FAIL)
-            summaries.append(f"'{name}' conversions flatlined after {when(cut)} while {e_tail:,} new identities arrived")
+            summaries.append(
+                f"'{name}' conversions flatlined after {when(cut)} while {e_tail:,} new identities arrived"
+            )
         elif expected >= WIRING_MIN_EXPECTED and c_tail < WIRING_WARN_RATIO * expected:
             statuses.append(WARN)
             summaries.append(f"'{name}' conversions dropped to {c_tail} against about {expected:.0f} expected")
@@ -449,9 +451,8 @@ def check_audit(ctx: Context) -> Check:
     c.evidence.append(f"{len(since)} audit entries in the project since launch at {when(exp.started_at)}")
     for severity, entry in hits:
         hours_in = hours(entry.created_date - exp.started_at)
-        c.evidence.append(
-            f"{severity} {when(entry.created_date)} ({hours_in:.1f} h in) by {entry.author or 'an API key'}: {entry.log}"
-        )
+        author = entry.author or "an API key"
+        c.evidence.append(f"{severity} {when(entry.created_date)} ({hours_in:.1f} h in) by {author}: {entry.log}")
     c.data = {"edits": len([h for h in hits if h[0] == FAIL]), "pauses": len([h for h in hits if h[0] == WARN])}
     c.status = worst(s for s, _ in hits)
     if c.status == FAIL:
@@ -471,7 +472,7 @@ def check_audit(ctx: Context) -> Check:
 
 def check_sample_size(ctx: Context) -> Check:
     c = Check("sample_size", "Sample size and runtime", READINESS, PASS, "")
-    pre, exp = ctx.pre, ctx.snap.experiment
+    pre = ctx.pre
     if pre is None:
         c.status, c.summary = FAIL, "No pre-registered sample size to compare against."
         return c
@@ -517,7 +518,8 @@ def check_interval(ctx: Context) -> Check:
     inf = reported or recomputed
     if not metric or not key or inf is None:
         c.status = WARN
-        c.summary = "No interval yet: Flagsmith shows 'Collecting data' until each arm has 50 identities and 5 conversions."
+        c.summary = ("No interval yet: Flagsmith shows 'Collecting data' until each arm has 50 identities "
+                     "and 5 conversions.")
         return c
     label = metric.event or metric.name
     c.evidence.append(f"{key} vs control on {label}: {_interval(inf)}, chance to beat control {pct(inf.chance_to_win)}")
@@ -592,7 +594,8 @@ def check_guardrail(ctx: Context) -> Check:
     c.status = worst(statuses)
     c.data = {"credibly_worse": bool(worse)}
     if c.status == FAIL:
-        c.summary = f"Guardrail credibly worse ({', '.join(worse)}): rule 3 says keep control whatever the primary says."
+        c.summary = (f"Guardrail credibly worse ({', '.join(worse)}): rule 3 says keep control whatever the "
+                     "primary says.")
     elif c.status == WARN:
         c.summary = "The guardrail leans worse or lacks data, but isn't credibly worse."
     else:
@@ -623,11 +626,11 @@ def check_novelty(ctx: Context) -> Check:
     late = stats.relative_lift(*(stats.proportion(halves[a][3], halves[a][2]) for a in (CONTROL, key)))
     c.data = {"early_lift": early, "late_lift": late}
     for label, i in (("first half", 0), ("second half", 2)):
-        c.evidence.append(
-            f"{label}: "
-            + ", ".join(f"{a} {halves[a][i + 1]}/{halves[a][i]} ({stats.proportion(halves[a][i + 1], halves[a][i]):.1%})"
-                        for a in (CONTROL, key))
-        )
+        parts = []
+        for a in (CONTROL, key):
+            exposed, converted = halves[a][i], halves[a][i + 1]
+            parts.append(f"{a} {converted}/{exposed} ({stats.proportion(converted, exposed):.1%})")
+        c.evidence.append(f"{label}: " + ", ".join(parts))
     c.evidence.append(f"Lift {pct(early, True)} before {when(mid)}, {pct(late, True)} after "
                       "(from running totals; conversions are bucketed by first conversion)")
     if early is None or late is None:
