@@ -1,0 +1,22 @@
+{
+  "name": "brick-or-swish",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Brick or Swish — Flagsmith Toggle Wars hackathon entry. One-button basketball A/B test.",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "simulate": "node scripts/simulate-traffic.mjs"
+  },
+  "dependencies": {
+    "@flagsmith/flagsmith": "^12.4.0"
+  },
+  "devDependencies": {
+    "@flagsmith/nodejs": "^9.5.0",
+    "typescript": "~5.9.3",
+    "vite": "^7.2.4"
+  }
+}
