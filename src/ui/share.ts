@@ -34,8 +34,8 @@ export async function renderScoreCard(summary: RoundSummary, url: string): Promi
   }
 
   // Sun
-  const horizon = H * 0.84;
-  const sunR = 250;
+  const horizon = H * 0.86;
+  const sunR = 220;
   const halo = ctx.createRadialGradient(W / 2, horizon, 100, W / 2, horizon, 700);
   halo.addColorStop(0, 'rgba(255,43,214,0.5)');
   halo.addColorStop(1, 'rgba(255,43,214,0)');
@@ -98,7 +98,7 @@ export async function renderScoreCard(summary: RoundSummary, url: string): Promi
 
   ctx.font = '600 34px "Space Grotesk", sans-serif';
   ctx.fillStyle = 'rgba(245,247,255,0.6)';
-  ctx.fillText(`ROUND ${summary.round} · ${summary.shots.length} SHOTS`, W / 2, 290);
+  ctx.fillText(`ROUND ${summary.round} · ${summary.shots.length} SHOTS`, W / 2, 272);
 
   const scoreText = String(summary.score);
   const maxText = `/${summary.maxScore}`;
@@ -107,15 +107,15 @@ export async function renderScoreCard(summary: RoundSummary, url: string): Promi
   ctx.font = '120px "Bebas Neue", Impact, sans-serif';
   const maxW = ctx.measureText(maxText).width;
   const left = W / 2 - (scoreW + 16 + maxW) / 2;
-  neon(scoreText, left + scoreW / 2, 630, 340, '#ffffff', '#3dfcff');
+  neon(scoreText, left + scoreW / 2, 595, 340, '#ffffff', '#3dfcff');
   ctx.font = '120px "Bebas Neue", Impact, sans-serif';
   ctx.fillStyle = 'rgba(245,247,255,0.5)';
   ctx.textAlign = 'left';
-  ctx.fillText(maxText, left + scoreW + 16, 630);
+  ctx.fillText(maxText, left + scoreW + 16, 595);
   ctx.textAlign = 'center';
 
   const rank = rankFor(summary.score, summary.maxScore);
-  neon(rank, W / 2, 745, 100, '#ffd23f', '#ff2bd6');
+  neon(rank, W / 2, 705, 100, '#ffd23f', '#ff2bd6');
 
   // Shot chips
   const size = 110;
@@ -123,7 +123,7 @@ export async function renderScoreCard(summary: RoundSummary, url: string): Promi
   const total = summary.shots.length * size + (summary.shots.length - 1) * gap;
   summary.shots.forEach((s, i) => {
     const x = W / 2 - total / 2 + i * (size + gap);
-    const y = 795;
+    const y = 752;
     const col = chipColor(s.outcome);
     ctx.fillStyle = 'rgba(255,255,255,0.05)';
     ctx.strokeStyle = col;
@@ -143,10 +143,10 @@ export async function renderScoreCard(summary: RoundSummary, url: string): Promi
 
   ctx.font = '700 46px "Space Grotesk", sans-serif';
   ctx.fillStyle = '#ffffff';
-  ctx.fillText('Think you can beat that?', W / 2, H - 150);
+  ctx.fillText('Think you can beat that?', W / 2, H - 118);
   ctx.font = '600 34px "Space Grotesk", sans-serif';
   ctx.fillStyle = '#3dfcff';
-  ctx.fillText(url.replace(/^https?:\/\//, '').replace(/\/$/, ''), W / 2, H - 90);
+  ctx.fillText(url.replace(/^https?:\/\//, '').replace(/\/$/, ''), W / 2, H - 62);
 
   return new Promise((resolve, reject) =>
     c.toBlob((b) => (b ? resolve(b) : reject(new Error('toBlob failed'))), 'image/png'),
